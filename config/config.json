@@ -1,0 +1,12 @@
+{
+    "telegram": {
+        "bot_token": "6474525795:AAE0REuCbl_4kxPL67IZKNAyZ-Kp1iOlYzg",
+        "chat_id": "2145296654"
+    },
+
+
+    "categorias": {
+        "Categoria1": "URL_DA_PRIMEIRA_CATEGORIA_AQUI",
+        "Categoria2": "URL_DA_SEGUNDA_CATEGORIA_AQUI"
+    }
+} 
