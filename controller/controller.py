@@ -1,4 +1,3 @@
-import logging
 import time
 from model import Scraper
 from view import Notificacao, Logger
@@ -11,23 +10,41 @@ class Controller:
         self.scraper = Scraper({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
         })
-        self.notificacao = Notificacao()
 
-    def monitorar_precos(self, listURLs_categorias, intervalo=60):
-        precos_antigos = {categoria: [] for categoria in listURLs_categorias}
+    def monitorar_precos(self, urls_categorias, notificacao, intervalo=60):
+        precos_antigos = {categoria: [] for categoria in urls_categorias}
 
         while True:
-            for categoria, url in listURLs_categorias.items():
-                preco_novo = self.scraper.fazer_scraping_produtos(url, categoria)
+            for categoria, url in urls_categorias.items():
+                produtos_novos = self.scraper.fazer_scraping_produtos(url, categoria)
 
-                if preco_novo:
-                    preco_antigo = precos_antigos[categoria]
-                    if preco_antigo:
-                        precos_antigos[categoria] = self.scraper.comparar_precos(preco_antigo, preco_novo)
-                    else:
-                        precos_antigos[categoria] = preco_novo
+                if produtos_novos:
+                    precos_antigos[categoria] = self.comparar_precos(precos_antigos[categoria], produtos_novos, notificacao)
 
             time.sleep(intervalo)
+
+
+    def comparar_precos(self, precos_antigos, produtos_novos, notificacao, limite_percentual=0.5):
+        links_antigos = {produto.link for produto in precos_antigos}
+
+        for produto_novo in produtos_novos:
+            if produto_novo.link in links_antigos:
+                produto_antigo = next((p for p in precos_antigos if p.link == produto_novo.link), None)
+                if produto_antigo:
+                    preco_antigo = self.get_price_float(produto_antigo.price)
+                    novo_preco = self.get_price_float(produto_novo.price)
+
+                    diferenca_percentual = abs((novo_preco - preco_antigo) / preco_antigo)
+
+                    if diferenca_percentual >= limite_percentual:
+                        mensagem = f"Preço alterado de R${preco_antigo:.2f} para R${novo_preco:.2f}!\nLink: {produto_novo.link}\nCategoria: {produto_novo.category}"
+                        notificacao.enviar_mensagem(mensagem)
+
+        return produtos_novos
+
+
+    def get_price_float(self, price):
+        return float(price.replace('R$', '').replace(',', '').replace('.', ''))
 
 
     def main(self):
@@ -39,15 +56,15 @@ class Controller:
             chat_id = telegram_config.get('chat_id')
 
             if bot_token and chat_id:
-                listURLs_categorias = config_data.get('categorias', {})
-                self.monitorar_precos(listURLs_categorias)
+                list_urls_categorias = config_data.get('categorias', {})
+                notificacao = Notificacao(bot_token, chat_id)
+                self.monitorar_precos(list_urls_categorias, notificacao)
             else:
                 self.logger.log_error("Configurações do Telegram incompletas. Verifique o arquivo de configuração.")
         else:
             self.logger.log_error("Falha ao carregar configurações.")
 
 
-#Iniciando o controlador
 if __name__ == "__main__":
     controller = Controller()
     controller.main()
