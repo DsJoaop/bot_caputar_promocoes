@@ -39,6 +39,6 @@ Isso iniciará o monitoramento com base nas configurações fornecidas no arquiv
 
 ## Estrutura do Projeto
 
-- **`model.py`:** Contém classes relacionadas aos dados e à lógica de scraping.
-- **`view.py`:** Classes responsáveis por notificações e logs.
-- **`controller.py`:** O controlador principal que coordena a execução do monitoramento de preços.
+- **`model`:** Contém classes relacionadas aos dados e à lógica de scraping.
+- **`view`:** Classes responsáveis por notificações e logs.
+- **`controller`:** O controlador principal que coordena a execução do monitoramento de preços.
