@@ -1,5 +1,7 @@
 import unittest
-from scraper import Scraper
+import requests
+from model.scraper import Scraper
+
 
 class TestScraper(unittest.TestCase):
     def setUp(self):
@@ -10,18 +12,38 @@ class TestScraper(unittest.TestCase):
         self.categoria = 'Placas Mãe'
 
     def test_fazer_scraping_produtos(self):
-        # Chama o método fazer_scraping_produtos
-        produtos = self.scraper.fazer_scraping_produtos(self.url, self.categoria)
+        try:
+            # Chama o método fazer_scraping_produtos
+            produtos = self.scraper.fazer_scraping_produtos(self.url, self.categoria)
 
-        # Verifica se a lista de produtos não está vazia
-        self.assertIsNotNone(produtos)
-        
-        # Verifica se os produtos possuem as informações esperadas
-        for produto in produtos:
-            self.assertIsNotNone(produto.link)
-            self.assertIsNotNone(produto.price)
-            self.assertIsNotNone(produto.category)
-            self.assertEqual(produto.category, self.categoria)
+            # Verifica o status da resposta HTTP
+            response = requests.get(self.url, headers=self.scraper.headers)
+            print(f'Código de status da requisição: {response.status_code}')
+
+            # Verifica se a lista de produtos não está vazia
+            self.assertIsNotNone(produtos)
+
+            # Verifica se os produtos possuem as informações esperadas
+            for produto in produtos:
+                self.assertIsNotNone(produto.link)
+                self.assertIsNotNone(produto.price)
+                self.assertIsNotNone(produto.category)
+                self.assertEqual(produto.category, self.categoria)
+
+            # Imprime a lista de produtos no console
+            if produtos:
+                print("Lista de produtos:")
+                for produto in produtos:
+                    print(f"Link: {produto.link}, Preço: {produto.price}, Categoria: {produto.category}")
+            else:
+                print("Nenhum produto encontrado.")
+        except requests.RequestException as e:
+            print(f"Erro na requisição HTTP: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Conteúdo da resposta: {e.response.text}")
+        except Exception as e:
+            print(f"Erro inesperado: {e}")
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,16 +1,29 @@
 import unittest
 from unittest.mock import patch
-from view import Notificacao
+from config.config import load_config
+from view.notificacao import Notificacao
+
 
 class TestNotificacao(unittest.TestCase):
     def setUp(self):
-        self.bot_token = 'your_bot_token_here'
-        self.chat_id = 'your_chat_id_here'
-        self.notificacao = Notificacao(self.bot_token, self.chat_id)
-        self.mensagem = "Exemplo de mensagem de notificação."
+        config = load_config()
+        if config:
+            telegram_config = config.get('telegram')
+            self.bot_token = telegram_config.get('bot_token')
+            self.chat_id = telegram_config.get('chat_id')
+            self.notificacao = Notificacao(self.bot_token, self.chat_id)
+            self.mensagem = "Exemplo de mensagem de notificação."
+        else:
+            self.bot_token = None
+            self.chat_id = None
+            self.notificacao = None
+            self.mensagem = None
 
     @patch('requests.post')
     def test_enviar_mensagem(self, mock_post):
+        if not self.bot_token or not self.chat_id or not self.notificacao:
+            self.skipTest("Configuração ausente. Não é possível realizar o teste.")
+
         # Simula a resposta da requisição POST
         mock_post.return_value.json.return_value = {'ok': True}
 
@@ -22,6 +35,7 @@ class TestNotificacao(unittest.TestCase):
             f"https://api.telegram.org/bot{self.bot_token}/sendMessage",
             data={'chat_id': self.chat_id, 'text': self.mensagem, 'parse_mode': 'HTML'}
         )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from bs4 import NavigableString
-from produto import Produto
+from model.produto import Produto
+
 
 class Scraper:
     def __init__(self, headers):
@@ -9,8 +9,8 @@ class Scraper:
 
     def extrair_informacoes_produto(self, card, categoria):
         try:
-            link = card.find('a', class_='jss16')['href']
-            price_tag = card.find('div', class_='jss88')
+            link = card.find('a', href=True)['href']
+            price_tag = card.find(lambda tag: tag.name == 'div' and 'R$' in tag.get_text())
 
             if price_tag:
                 price = price_tag.get_text(separator='', strip=True).replace('R$&nbsp;', '').replace(',', '').replace('.', '')
@@ -27,7 +27,7 @@ class Scraper:
                 response = session.get(url, headers=self.headers)
                 response.raise_for_status()
                 soup = BeautifulSoup(response.content, 'html.parser')
-                cards = soup.find_all('div', class_='MuiPaper-root jss284 MuiPaper-elevation1 MuiPaper-rounded')
+                cards = soup.find_all('div', class_='MuiGrid-root')
 
                 informacoes_produto = []
                 for card in cards:
