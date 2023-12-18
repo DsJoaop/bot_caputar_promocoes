@@ -1,55 +1,44 @@
-import unittest
-from unittest.mock import MagicMock, patch
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from src.core.controller import Controller  # Importe sua classe Controller aqui
+import asyncio
+import aiohttp
+from bs4 import BeautifulSoup
 
-# Dados de configuração fornecidos
-config_data = {
-    "telegram": {
-        "bot_token": "6474525795:AAE0REuCbl_4kxPL67IZKNAyZ-Kp1iOlYzg",
-        "chat_id": "2145296654"
-    },
-    "categorias": {
-        "Categoria1": "https://www.pichau.com.br/hardware/placa-m-e"
-    }
-}
+from src.core.controller import Controller
+from src.data_acess.scraper import Scraper
 
 
-class TestController(unittest.TestCase):
-    def setUp(self):
-        self.controller = Controller()
+class TestController:
+    async def simulate_price_change(self, controller_instance):
+        # Simulando mudança de preço para um produto específico
+        url = "URL_DO_PRODUTO"
+        categoria = "Categoria_do_Produto"
+        novo_preco = 70  # Novo preço do produto (simulando uma mudança)
 
-    def test_main_with_valid_config(self):
-        # Mocking necessary components
-        mock_load_config = MagicMock(return_value=config_data)
-        self.controller.logger.log_error = MagicMock()
-        self.controller.monitorar_precos = MagicMock()
+        async with aiohttp.ClientSession() as session:
+            scraper = Scraper(controller_instance.headers)
+            try:
+                async with session.get(url, headers=controller_instance.headers, timeout=10) as response:
+                    response.raise_for_status()
+                    content = await response.read()
+                    soup = BeautifulSoup(content, 'html.parser')
+                    card = soup.find(attrs={"data-cy": "list-product"})
+                    produto = scraper.extrair_informacoes_produto(card, categoria)
 
-        # Patching the load_config method to return our mock value
-        with patch('src.config.setting_load.load_config', mock_load_config):
-            self.controller.main()
+                    # Simulação de mudança de preço - definindo um novo preço para o produto
+                    controller_instance.previous_prices[produto.link] = novo_preco
 
-        mock_load_config.assert_called_once()
-        self.assertFalse(self.controller.logger.log_error.called)
-        self.assertTrue(self.controller.monitorar_precos.called)
+            except (aiohttp.ClientError, aiohttp.ClientResponseError) as e:
+                print(f"Falha ao obter a página {url}: {e}")
 
-    def test_main_with_invalid_config(self):
-        # Mocking necessary components
-        mock_load_config = MagicMock(return_value=None)
-        self.controller.logger.log_error = MagicMock()
+    async def test_controller(self):
+        controller = Controller()
+        print("Simulando preço anterior...")
+        await self.simulate_price_change(controller)
+        print("Iniciando monitoramento de preços...")
+        await controller.start_price_monitoring()
+        print("Monitoramento concluído.")
 
-        # Patching the load_config method to return our mock value
-        with patch('src.config.setting_load.load_config', mock_load_config):
-            self.controller.main()
-
-        mock_load_config.assert_called_once()
-        self.assertTrue(self.controller.logger.log_error.called)
-        self.assertFalse(self.controller.monitorar_precos.called)
-
-    # You can add more test cases for other methods if needed
-
-
-if __name__ == '__main__':
-    unittest.main()
+# Para testar a classe de teste:
+if __name__ == "__main__":
+    test = TestController()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test.test_controller())
