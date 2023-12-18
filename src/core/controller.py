@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
 from src.data_acess.scraper import Scraper
@@ -14,24 +16,32 @@ class Controller:
     def start_price_monitoring(self):
         if self.config and 'categorias' in self.config:
             categorias = self.config['categorias']
-            scraper = Scraper(self.headers)  # Passar os headers diretamente para o Scraper
+            scraper = Scraper(self.headers)
+
+            # Usando defaultdict para agrupar produtos por categoria
+            produtos_por_categoria = defaultdict(list)
 
             for categoria, url in categorias.items():
                 produtos = scraper.fazer_scraping_produtos(url, categoria)
 
                 if produtos:
-                    # Aqui você pode processar os produtos obtidos, como enviar notificações via Telegram, etc.
-                    notificador = Notificacao(self.config['telegram']['bot_token'], self.config['telegram']['chat_id'])
-                    for produto in produtos:
-                        mensagem = f"Novo produto encontrado!\nLink: {produto.link}\nPreço: R${produto.price}\nCategoria: {produto.category}"
-                        notificador.enviar_mensagem(mensagem)
+                    produtos_por_categoria[categoria].extend(produtos)
                 else:
                     print(f"Nenhum produto encontrado para a categoria: {categoria}")
+
+            # Enviar notificações agrupadas por categoria
+            notificador = Notificacao(self.config['telegram']['bot_token'], self.config['telegram']['chat_id'])
+            for categoria, produtos in produtos_por_categoria.items():
+                if produtos:
+                    mensagem = f"Novos produtos encontrados na categoria {categoria}:\n"
+                    # Limitando a 10 produtos por mensagem para evitar erros de tamanho
+                    for i, produto in enumerate(produtos[:10], start=1):
+                        mensagem += f"\n{i}. Link: {produto.link}\n   Preço: R${produto.price}\n"
+
+                    notificador.enviar_mensagem(mensagem)
         else:
             print(
-                "Configurações não carregadas ou categorias não encontradas. Não foi possível iniciar o monitoramento "
-                "de preço.")
-
+                "Configurações não carregadas ou categorias não encontradas. Não foi possível iniciar o monitoramento de preço.")
 
 # Para testar a classe Controller:
 if __name__ == "__main__":
