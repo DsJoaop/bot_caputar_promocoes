@@ -1,99 +1,67 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-# Caminho para o ChromeDriver
-chrome_driver_path = r'C:\Users\joaop\PycharmProjects\Bot_Promocao\chromedriver.exe'
-
-# Configuração do serviço do ChromeDriver
-service = Service(chrome_driver_path)
-
-# Configuração das opções do navegador (opcional)
-options = webdriver.ChromeOptions()
-options.add_argument("--start-maximized")  # Para iniciar a janela do navegador maximizada
-
-# Inicializa o navegador com as opções e o serviço
-driver = webdriver.Chrome(service=service, options=options)
+import pyautogui
+import webbrowser
+import os
+import time
 
 
-# Navega até o link do produto
-driver.get("https://www.pichau.com.br/processador-amd-ryzen-7-5700x-8-core-16-threads-3-4ghz-4-6ghz-turbo-cache-36mb-am4-100-100000926wof")
+class PichauAutomator:
+    def __init__(self):
+        self.img_paths = [
+            'assets/pichau/1_comprar.png',
+            'assets/pichau/2_finalizar_pedido.png',
+            'assets/pichau/3_metodo_envio.png',
+            'assets/pichau/4_continuar_pagamento.png',
+            'assets/pichau/5_boleto_bancario.png',
+            'assets/pichau/6_continuar_revisao.png',
+            'assets/pichau/7_termos.png'
+        ]
+        self.timeout_seconds = 10
 
-# Espera até que o rodapé esteja presente, indicando que a página está carregada
-footer_element = WebDriverWait(driver, 20).until(
-    EC.presence_of_element_located((By.XPATH, '//footer'))
-)
+    def path_exists(self, image_path):
+        if not os.path.exists(image_path):
+            print(f"Arquivo não encontrado: {image_path}")
+            return False
+        return True
 
-# Aceitar os cookies se necessário
-try:
-    cookies_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, 'rcc-confirm-button'))
-    )
-    cookies_button.click()
-except Exception as e:
-    print("Erro ao tentar aceitar os cookies:", e)
+    def search_on_screen(self, image_path):
+        if not self.path_exists(image_path):
+            return
 
-# Clique no botão "Adicionar ao carrinho"
-try:
-    add_to_cart_button = WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-cy="add-to-cart"]'))
-    )
-    add_to_cart_button.click()
-except Exception as e:
-    print("Erro ao tentar adicionar ao carrinho:", e)
+        start_time = time.time()
 
-# Aguarde e clique no primeiro label dentro do elemento específico (não sei qual seria esse passo no seu caso)
-try:
-    shipping_label = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-cy="shipping-address-item"]'))
-    )
-    shipping_label.click()
-except Exception as e:
-    print("Erro ao tentar selecionar endereço de envio:", e)
+        while time.time() - start_time < self.timeout_seconds:
+            try:
+                x, y = pyautogui.locateCenterOnScreen(image_path, confidence=0.8)
+                pyautogui.click(x, y)
+                print("\n-----------------------------------------------------")
+                print(f"{image_path} encontrado.")
+                print("-----------------------------------------------------\n")
 
-# Clique no botão para continuar para o pagamento
-try:
-    continue_to_payment = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-cy="address-continue-to-payment"]'))
-    )
-    continue_to_payment.click()
-except Exception as e:
-    print("Erro ao tentar prosseguir para o pagamento:", e)
+                return True
+            except pyautogui.ImageNotFoundException:
+                print(f"Searching for {image_path}...")
 
-# Clique na div específica de método de pagamento
-try:
-    payment_method = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.ID, 'payment-method-mercadopago_custom_pix'))
-    )
-    payment_method.click()
-except Exception as e:
-    print("Erro ao tentar selecionar o método de pagamento:", e)
+        print(f"Imagem {image_path} não encontrada após {self.timeout_seconds} segundos.")
+        return False
 
-# Continue para revisão
-try:
-    continue_to_review = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-cy="payment-continue-to-review"]'))
-    )
-    continue_to_review.click()
-except Exception as e:
-    print("Erro ao tentar prosseguir para a revisão:", e)
+    def run_automation(self, url):
+        start_time = time.time()
 
-# Marque o checkbox
-try:
-    checkbox = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[type="checkbox"]'))
-    )
-    checkbox.click()
-except Exception as e:
-    print("Erro ao tentar marcar o checkbox:", e)
+        webbrowser.open(url)
 
-# Finalize o pedido
-try:
-    finalize_order_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-cy="finalize-order"]'))
-    )
-    finalize_order_button.click()
-except Exception as e:
-    print("Erro ao tentar finalizar o pedido:", e)
+        for img_path in self.img_paths:
+            if img_path == self.img_paths[5]:
+                time.sleep(0.3)
+
+            if not self.search_on_screen(img_path):
+                break
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"Tempo de execução: {execution_time} segundos")
+
+
+if __name__ == "__main__":
+    automator = PichauAutomator()
+    automator.run_automation(
+        "https://www.pichau.com.br/processador-amd-ryzen-5-7600-6-core-12-threads-3-8ghz-5-1ghz-turbo-cache-38mb-am5-100-100001015box")
