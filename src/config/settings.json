@@ -6,6 +6,9 @@
 
 
     "categorias": {
-        "Categoria1": "https://www.pichau.com.br/hardware/placa-m-e"
+        "Placas Mae am4": "https://www.pichau.com.br/hardware/placa-m-e?socket=539&formato_placa=11&tipo_de_memoria=422&marcas=121,34,36&sort=price-asc",
+        "Placas de Video AMD": "https://www.pichau.com.br/hardware/placa-de-video/amd?forca=367&product_category=6459&sort=price-asc&rgpu=611,6337,6347,6481,6631,6632,7400,7428,7429",
+        "Placas de Video NVIDEA": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?placadevideo=130&rgpu=6343,6359,6584,6592,700,712,717,7192,7369,7383,7401,7426,748,766&sort=price-asc",
+        "Processador AM4": "https://www.pichau.com.br/hardware/processadores/amd?socket=539&vgaintegrado=153&plataforma=7&nucleo=135,154,710,729,831"
     }
 } 

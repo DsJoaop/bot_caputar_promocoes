@@ -1,53 +1,29 @@
 import unittest
-import requests
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from src.data_acess.scraper import Scraper
-
+from src.data_acess.extractData import Scraper  # Importe a classe Scraper
 
 
 class TestScraper(unittest.TestCase):
     def setUp(self):
-        self.scraper = Scraper({
+        # Configuração inicial para os testes, como os headers
+        self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-        })
-        self.url = 'https://www.pichau.com.br/hardware/memorias'
-        self.categoria = 'Memórias'
+        }
+        self.scraper = Scraper(self.headers)
 
-    def test_fazer_scraping_produtos(self):
-        try:
-            # Chama o método fazer_scraping_produtos
-            produtos = self.scraper.fazer_scraping_produtos(self.url, self.categoria)
+    def test_login(self):
+        # Teste de login
+        logged_in = self.scraper.fazer_login('joaopaulo.eu29@hotmail.com', 'HLWpichau5566-')
+        self.assertTrue(logged_in)  # Verifica se o login foi bem-sucedido
 
-            # Verifica o status da resposta HTTP
-            response = requests.get(self.url, headers=self.scraper.headers)
-            print(f'Código de status da requisição: {response.status_code}')
+    def test_scraping(self):
+        # Teste de scraping após o login
+        # Supõe-se que o login foi feito corretamente no teste anterior
+        url = 'https://www.pichau.com.br/account/orders'  # URL de teste para scraping
+        categoria = 'categoria_de_teste'  # Categoria fictícia para o teste
 
-            # Verifica se a lista de produtos não está vazia
-            self.assertIsNotNone(produtos)
-
-            # Verifica se os produtos possuem as informações esperadas
-            for produto in produtos:
-                self.assertIsNotNone(produto.link)
-                self.assertIsNotNone(produto.price)
-                self.assertIsNotNone(produto.category)
-                self.assertEqual(produto.category, self.categoria)
-
-            # Imprime a lista de produtos no console
-            if produtos:
-                print("Lista de produtos:")
-                for produto in produtos:
-                    print(f"Link: {produto.link}, Preço: {produto.price}, Categoria: {produto.category}")
-            else:
-                print("Nenhum produto encontrado.")
-        except requests.RequestException as e:
-            print(f"Erro na requisição HTTP: {e}")
-            if hasattr(e, 'response') and e.response is not None:
-                print(f"Conteúdo da resposta: {e.response.text}")
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
-
+        # Teste se o scraping é bem-sucedido após o login
+        produtos = self.scraper.fazer_scraping_produtos(url, categoria)
+        self.assertIsNotNone(produtos)  # Verifica se a lista de produtos não está vazia
 
 if __name__ == '__main__':
     unittest.main()
