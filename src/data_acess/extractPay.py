@@ -6,17 +6,20 @@ import time
 
 class PichauAutomator:
     def __init__(self):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        parent_directory = os.path.dirname(current_directory)
+        assets_directory = os.path.abspath(os.path.join(parent_directory, '..', 'assets', 'pichau'))
+
         self.img_paths = [
-            'assets/pichau/1_comprar.png',
-            'assets/pichau/2_finalizar_pedido.png',
-            'assets/pichau/3_metodo_envio.png',
-            'assets/pichau/4_continuar_pagamento.png',
-            'assets/pichau/5_boleto_bancario.png',
-            'assets/pichau/6_continuar_revisao.png',
-            'assets/pichau/7_termos.png'
+            os.path.join(assets_directory, '1_comprar.png'),
+            os.path.join(assets_directory, '2_finalizar_pedido.png'),
+            os.path.join(assets_directory, '3_metodo_envio.png'),
+            os.path.join(assets_directory, '4_continuar_pagamento.png'),
+            os.path.join(assets_directory, '5_boleto_bancario.png'),
+            os.path.join(assets_directory, '6_continuar_revisao.png'),
+            os.path.join(assets_directory, '7_termos.png')
         ]
         self.timeout_seconds = 10
-
     def path_exists(self, image_path):
         if not os.path.exists(image_path):
             print(f"Arquivo não encontrado: {image_path}")
