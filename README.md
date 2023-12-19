@@ -10,24 +10,22 @@ Este é um projeto Python para monitoramento de preços. Realiza scraping de web
 
 ## Estrutura de Diretórios
 
-```json
-├── src
-│   ├── bot_iteration
-│   │   └── telegram_notify.py
-│   ├── config
-│   │   ├── settings.json
-│   │   └── setting_load.py
-│   ├── core
-│   │   ├── mainController.py
-│   │   └── monitorCategory.py
-│   ├── data_acess
-│   │   ├── extractData.py
-│   │   └── extractPay.py
-│   └── model
-│       └── produto.py
-├── readme.md
-└── requirements.txt
-```
+- src
+  - bot_iteration
+    - telegram_notify.py
+  - config
+    - settings.json
+    - setting_load.py
+  - core
+    - mainController.py
+    - monitorCategory.py
+  - data_acess
+    - extractData.py
+    - extractPay.py
+  - model
+    - produto.py
+- readme.md
+- requirements.txt
 
 ## Descrição
 
