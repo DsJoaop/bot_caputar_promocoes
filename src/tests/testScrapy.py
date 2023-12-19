@@ -10,11 +10,6 @@ class TestScraper(unittest.TestCase):
         }
         self.scraper = Scraper(self.headers)
 
-    def test_login(self):
-        # Teste de login
-        logged_in = self.scraper.fazer_login('joaopaulo.eu29@hotmail.com', 'HLWpichau5566-')
-        self.assertTrue(logged_in)  # Verifica se o login foi bem-sucedido
-
     def test_scraping(self):
         # Teste de scraping após o login
         # Supõe-se que o login foi feito corretamente no teste anterior
