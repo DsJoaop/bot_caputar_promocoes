@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 from src.model.produto import Produto
+import re
 
 
 class Scraper:
@@ -12,27 +12,25 @@ class Scraper:
         link_produto = card.get('href')
         preco_element = card.find(lambda tag: tag.name == 'div' and tag.get_text().strip().startswith('R$'))
 
-        preco_texto = preco_element.get_text().strip() if preco_element else ''
-        preco_regex = r'R\$\s?(\d{1,3}(?:[.,]\d{3})*(?:,\d{1,2})?)'
+        if preco_element:
+            valor_texto = preco_element.get_text().strip()
+            valor_sem_RS = re.sub(r'[^\d.]', '', valor_texto)
 
-        preco_match = re.search(preco_regex, preco_texto)
-
-        if preco_match:
-            preco_formatado = preco_match.group(1).replace('.', '').replace(',', '.')
-            preco_produto = float(preco_formatado)
+            # Converter para float
+            valor_float = float(valor_sem_RS)
             link_produto = f"https://www.pichau.com.br{link_produto.replace("'", '')}"
-            return Produto(link_produto, preco_produto, categoria)
+            return Produto(link_produto, valor_float, categoria)
 
         return None
 
     def fazer_scraping_produtos(self, url, categoria):
         try:
-            response = requests.get(url, headers=self.headers, timeout=10)  # Reduzindo o timeout para 10 segundos
+            response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
             cards = soup.find_all(attrs={"data-cy": "list-product"})
 
-            produtos = [self.extrair_informacoes_produto(card, categoria) for card in cards]
+            produtos = [self.extrair_informacoes_produto(card, categoria) for card in cards if card]
             return [produto for produto in produtos if produto]
         except requests.RequestException as e:
             print("Falha ao obter a página:", e)

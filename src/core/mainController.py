@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
 from src.core.monitorCategory import CategoryMonitor
@@ -17,17 +19,17 @@ class MainController:
 
     def iniciar_monitoramento(self):
         if self.config and 'categorias' in self.config:
-            threads = []
-            for categoria, url in self.config['categorias'].items():
-                category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador, self.scraper)
-                threads.append(category_monitor)
-                category_monitor.start()
-
-            for thread in threads:
-                thread.join()
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                for categoria, url in self.config['categorias'].items():
+                    executor.submit(self.monitorar_categoria, categoria, url)
         else:
             print(
-                "Configurações não carregadas ou categorias não encontradas. Não foi possível iniciar o monitoramento de preço.")
+                "Configurações não carregadas ou categorias não encontradas."
+                " Não foi possível iniciar o monitoramento de preço.")
+
+    def monitorar_categoria(self, categoria, url):
+        category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador, self.scraper)
+        category_monitor.run()
 
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ class PichauAutomator:
             os.path.join(assets_directory, '7_termos.png')
         ]
         self.timeout_seconds = 10
+
     def path_exists(self, image_path):
         if not os.path.exists(image_path):
             print(f"Arquivo não encontrado: {image_path}")
