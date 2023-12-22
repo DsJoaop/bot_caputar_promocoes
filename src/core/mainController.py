@@ -19,7 +19,7 @@ class MainController:
 
     def iniciar_monitoramento(self):
         if self.config and 'categorias' in self.config:
-            with ThreadPoolExecutor(max_workers=6) as executor:
+            with ThreadPoolExecutor(max_workers=10) as executor:
                 for categoria, url in self.config['categorias'].items():
                     executor.submit(self.monitorar_categoria, categoria, url)
         else:

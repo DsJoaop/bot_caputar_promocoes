@@ -30,8 +30,15 @@ class Scraper:
             soup = BeautifulSoup(response.content, 'html.parser')
             cards = soup.find_all(attrs={"data-cy": "list-product"})
 
-            produtos = [self.extrair_informacoes_produto(card, categoria) for card in cards if card]
-            return [produto for produto in produtos if produto]
+            produtos = []
+            for card in cards:
+                produto = self.extrair_informacoes_produto(card, categoria)
+                if produto is None:
+                    # Se o produto não puder ser extraído, saia do loop
+                    break
+                produtos.append(produto)
+
+            return produtos
         except requests.RequestException as e:
             print("Falha ao obter a página:", e)
             return []
