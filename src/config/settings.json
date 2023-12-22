@@ -10,6 +10,7 @@
         "Placas de Video NVIDEA": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?price=*_3000&rgpu=6343,6359,6584,6592,690,700,712,717,7192,7401,7426,766,767",
         "Processador AM4": "https://www.pichau.com.br/hardware/processadores/amd?socket=539&vgaintegrado=153&plataforma=7&nucleo=135,154,710,729,831",
         "SSD": "https://www.pichau.com.br/hardware/ssd?marcas=210,536,851&price=*_2250",
-        "Memoria ram":"https://www.pichau.com.br/hardware/memorias?marcas=210,536&price=*_2050"
+        "Memoria ram":"https://www.pichau.com.br/hardware/memorias?marcas=210,536&price=*_2050",
+        "Monitor":"https://www.pichau.com.br/monitores/monitor-casa-e-escritorio?price=*_1400"
     }
 } 
