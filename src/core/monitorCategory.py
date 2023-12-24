@@ -1,4 +1,5 @@
 import concurrent.futures  # For concurrent operations
+import random
 import time
 
 from src.data_acess.extractPay import PichauAutomator
@@ -52,13 +53,10 @@ class CategoryMonitor:
                 link = novo_produto.link
                 if link in self.produtos:
                     produto_anterior = self.produtos[link]
-                    previous_price = produto_anterior.price
-                    current_price = novo_produto.price
-
-                    if current_price < (1 - self.desconto_minimo / 100) * previous_price:
-                        discount = ((previous_price - current_price) / previous_price) * 100
+                    discount = ((produto_anterior.price - novo_produto.price) / produto_anterior.price) * 100
+                    if discount >= self.desconto_minimo:
                         self.automator.run_automation(link)
-                        self.enviar_notificacao(novo_produto, previous_price, current_price, discount)
+                        self.enviar_notificacao(novo_produto, produto_anterior.price, novo_produto.price, discount)
                         self.produtos[link] = novo_produto
                 else:
                     # Se o produto é novo, adiciona ao dicionário
