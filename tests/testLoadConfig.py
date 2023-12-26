@@ -1,6 +1,7 @@
 import unittest
 from src.config.setting_load import load_config  #
 
+
 class TestLoadConfig(unittest.TestCase):
 
     def test_load_config_file_exists(self):
@@ -26,6 +27,7 @@ class TestLoadConfig(unittest.TestCase):
         self.assertIn('Categoria1', config['categorias'])
         self.assertTrue(config['categorias']['Categoria1'].startswith('http'))
         # Adicione mais verificações conforme necessário para o formato do link, se desejar
+
 
 if __name__ == '__main__':
     unittest.main()

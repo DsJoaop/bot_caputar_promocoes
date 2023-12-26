@@ -1,7 +1,8 @@
 {
     "telegram": {
         "bot_token": "6474525795:AAE0REuCbl_4kxPL67IZKNAyZ-Kp1iOlYzg",
-        "chat_id": "2145296654"
+        "chat_id": "2145296654",
+        "ngrok_url": "https://efe5-170-231-85-158.ngrok-free.app"
     },
 
 

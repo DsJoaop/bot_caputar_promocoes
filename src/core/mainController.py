@@ -1,5 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
 from src.core.monitorCategory import CategoryMonitor
@@ -13,9 +12,13 @@ class MainController:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                           'Chrome/58.0.3029.110 Safari/537.3'
         }
-        self.notificador = Notificacao(self.config['telegram']['bot_token'], self.config['telegram']['chat_id'])
-        self.scraper = Scraper(self.headers)
-        self.desconto_minimo = 40
+        if self.config and 'telegram' in self.config:
+            telegram_config = self.config['telegram']
+            self.notificador = Notificacao(telegram_config)
+            self.scraper = Scraper(self.headers)
+            self.desconto_minimo = 0
+        else:
+            raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
 
     def iniciar_monitoramento(self):
         if self.config and 'categorias' in self.config:
@@ -33,5 +36,8 @@ class MainController:
 
 
 if __name__ == "__main__":
-    controller = MainController()
-    controller.iniciar_monitoramento()
+    try:
+        controller = MainController()
+        controller.iniciar_monitoramento()
+    except ValueError as e:
+        print(f"Erro ao iniciar: {e}")
