@@ -38,9 +38,9 @@ class PichauAutomator:
         if image_path in [self.img_paths[3], self.img_paths[5]]:
             time.sleep(0.9)
 
-    def search_on_screen(self, image_path):
+    def search_on_screen(self, image_path, index):
         if not self.path_exists(image_path):
-            return
+            return False, index
 
         start_time = time.time()
         self.wait(image_path)
@@ -54,27 +54,34 @@ class PichauAutomator:
                 print(f"{image_path} found.")
                 print("-----------------------------------------------------\n")
 
-                return True
+                return True, index
             except pyautogui.ImageNotFoundException:
                 print(f"Searching for {image_path}...")
 
         print(f"Image path '{image_path}' not found on your screen after {self.timeout_seconds} seconds.\n")
-        return False
+        return False, index
 
     def run_automation(self, url):
         start_time = time.time()
 
         webbrowser.open(url)
 
-        for img_path in self.img_paths:
-            if not self.search_on_screen(img_path):
-                print(
-                    f"The application was closed because it could not find the image '{img_path}' on your screen.\n")
-                break
+        index = 0
+        while index < len(self.img_paths):
+            found, current_index = self.search_on_screen(self.img_paths[index], index)
+            if not found:
+                if current_index > 0:
+                    index = current_index - 1
+                else:
+                    print("No previous image to check. Exiting.")
+                    break
+            else:
+                index += 1
 
         end_time = time.time()
         execution_time = end_time - start_time
         print(f"Execution time: {execution_time} seconds.")
+
 
 if __name__ == "__main__":
     automator = PichauAutomator()

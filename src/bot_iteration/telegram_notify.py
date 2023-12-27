@@ -1,90 +1,57 @@
 import requests
-from flask import Flask, request, jsonify
 import logging
 
 from src.config.setting_load import load_config
+from src.model.produto import Produto
 
-app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
 
 class Notificacao:
-    def __init__(self, conf):
-        self.config = conf
+    def __init__(self):
+        self.config = load_config()['telegram']
         self.base_url = f"https://api.telegram.org/bot{self.config['bot_token']}/"
-        self.configurar_webhook()
         self.chat_id = self.config['chat_id']
 
-    def configurar_webhook(self):
-        webhook_url = self.config['ngrok_url']
-        api_url = f"https://api.telegram.org/bot{self.config['bot_token']}/setWebhook?url={webhook_url}"
-
-        try:
-            response = requests.get(api_url, verify=True)  # Verificar SSL
-            if response.status_code == 200:
-                print("Webhook configurado com sucesso!")
-            else:
-                print("Falha ao configurar o webhook")
-        except requests.RequestException as e:
-            print(f"Erro ao configurar o webhook: {e}")
-
-    def enviar_mensagem_com_botao(self, mensagem):  # Apenas um parâmetro 'mensagem' é esperado
-        dados = {
-            'chat_id': self.chat_id,  # Usa 'self.chat_id', mas 'chat_id' não é passado como argumento
-            'text': mensagem,
-            'reply_markup': {
-                'inline_keyboard': [
-                    [{'text': 'Sim', 'callback_data': 'sim'}, {'text': 'Não', 'callback_data': 'nao'}]
-                ]
-            },
-            'parse_mode': 'HTML'
-        }
-
-        try:
-            resposta = requests.post(self.base_url + 'sendMessage', json=dados, verify=True)  # Verificar SSL
-            resposta.raise_for_status()
-            return resposta.json()
-
-        except requests.RequestException as e:
-            print(f"Erro de requisição: {e}")
-            return None
-
-    def enviar_mensagem(self, chat_id, mensagem):
+    def enviar_mensagem(self, chat_id, mensagem, reply_markup=None):
         dados = {
             'chat_id': chat_id,
             'text': mensagem,
             'parse_mode': 'HTML'
         }
+        if reply_markup:
+            dados['reply_markup'] = reply_markup
 
+        url = f"{self.base_url}sendMessage"
         try:
-            resposta = requests.post(self.base_url + 'sendMessage', json=dados, verify=True)
-            resposta.raise_for_status()
-            return resposta.json()
-
+            response = requests.post(url, json=dados)
+            if response.status_code == 200:
+                logger.info("Mensagem enviada com sucesso!")
+            else:
+                logger.error("Falha ao enviar mensagem")
         except requests.RequestException as e:
-            print(f"Erro de requisição: {e}")
-            return None
+            logger.exception(f"Erro ao enviar mensagem: {e}")
 
-
-configuracao = load_config()
-notify = Notificacao(configuracao['telegram'])
-
-
-@app.route('/resposta_telegram', methods=['POST'])
-def resposta_telegram():
-    data = request.json
-
-    if 'callback_query' in data:
-        resposta = data['callback_query']['data']
-        chat_id = data['callback_query']['message']['chat']['id']
-
-        notify.enviar_mensagem(chat_id, f"Você escolheu '{resposta.capitalize()}'")
-
-    return jsonify({'success': True})
+    def enviar_notificacao(self, produto, previous_price, current_price, discount):
+        mensagem = (
+            f"🎉 Desconto detectado! 🎉\n\n\n"
+            f"🔗 Link: {produto.link}\n\n"
+            f"💰 Preço anterior: R${previous_price:.2f}\n\n"
+            f"💸 Novo preço: R${current_price:.2f}\n\n"
+            f"💲 Desconto: {discount:.2f}% OFF\n\n"
+            f"ℹ️ Deseja comprar este item?\n\n"
+            f"Responda SIM ou NÃO para confirmar sua escolha.\n"
+        )
+        reply_markup = {
+            'inline_keyboard': [
+                [{'text': 'Sim', 'callback_data': 'sim'}, {'text': 'Não', 'callback_data': 'nao'}]
+            ]
+        }
+        self.enviar_mensagem(self.chat_id, mensagem, reply_markup)
 
 
 if __name__ == "__main__":
-    config = load_config()
-    notificacao = Notificacao(config['telegram'])
-    notificacao.enviar_mensagem_com_botao("Escolha 'Sim' ou 'Não'")
-    app.run(port=5000)
+    logging.basicConfig(level=logging.INFO)
+    notify = Notificacao()
+    produto = Produto("https://www.pichau.com.br/cadeira-office-zinnia-aspen-preto-zno-apn-bk", 20, "teste")
+    notify.enviar_notificacao(produto,10,20,10)

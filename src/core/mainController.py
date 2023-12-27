@@ -8,14 +8,14 @@ from src.data_acess.extractData import Scraper
 class MainController:
     def __init__(self):
         self.config = load_config()
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                          'Chrome/58.0.3029.110 Safari/537.3'
-        }
         if self.config and 'telegram' in self.config:
-            telegram_config = self.config['telegram']
-            self.notificador = Notificacao(telegram_config)
-            self.scraper = Scraper(self.headers)
+            self.notificador = Notificacao()
+            self.scraper = Scraper(
+                {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                  'Chrome/58.0.3029.110 Safari/537.3'
+                }
+            )
             self.desconto_minimo = 0
         else:
             raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")

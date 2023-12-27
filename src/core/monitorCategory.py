@@ -1,7 +1,5 @@
-import asyncio
 import threading
 import time
-from src.data_acess.extractPay import PichauAutomator
 
 
 class CategoryMonitor:
@@ -11,7 +9,6 @@ class CategoryMonitor:
         self.desconto_minimo = desconto_minimo
         self.notificador = notificador
         self.scraper = scraper
-        self.automator = PichauAutomator()
         self.produtos = {}  # Dicionário para armazenar link: objeto Produto
 
         # Primeira execução para definir produtos iniciais
@@ -19,26 +16,6 @@ class CategoryMonitor:
         for produto in novos_produtos:
             self.produtos[produto.link] = produto
 
-    async def enviar_notificacao(self, produto, previous_price, current_price, discount):
-        mensagem = (
-            f"🎉 Desconto detectado! 🎉\n\n\n"
-            f"🔗 Link: {produto.link}\n\n"
-            f"💰 Preço anterior: R${previous_price:.2f}\n\n"
-            f"💸 Novo preço: R${current_price:.2f}\n\n"
-            f"💲 Desconto: {discount:.2f}% OFF\n\n"
-            f"ℹ️ Deseja comprar este item?\n\n"
-            f"Responda SIM ou NÃO para confirmar sua escolha.\n"
-        )
-        resposta = await self.notificador.enviar_mensagem_com_botao_assincrono(mensagem)
-        print(resposta)
-        await self.processar_resposta(resposta, produto.link)
-
-    def comprar_produto(self, link):
-        self.automator.run_automation(link)
-
-    async def processar_resposta(self, resposta, link):
-        if resposta == 'SIM':
-            await asyncio.to_thread(self.comprar_produto, link)
 
     def run(self):
         while True:
@@ -51,9 +28,12 @@ class CategoryMonitor:
                 if link in self.produtos:
                     produto_anterior = self.produtos[link]
                     discount = ((produto_anterior.price - novo_produto.price) / produto_anterior.price) * 100
-                    if discount >= self.desconto_minimo:
-                        asyncio.run(
-                            self.enviar_notificacao(novo_produto, produto_anterior.price, novo_produto.price, discount))
+                    if discount > 0:
+                        notification_thread = threading.Thread(
+                            target=self.notificador.enviar_notificacao,
+                            args=(novo_produto, produto_anterior.price, novo_produto.price, discount)
+                        )
+                        notification_thread.start()
                         self.produtos[link] = novo_produto
                 else:
                     self.produtos[link] = novo_produto
