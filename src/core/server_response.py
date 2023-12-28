@@ -1,5 +1,8 @@
-from flask import Flask, jsonify, request
+import subprocess
+import time
+
 import requests
+from flask import Flask, jsonify, request
 
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
@@ -20,12 +23,29 @@ class TelegramBot:
         config = load_config()['telegram']
         self.notify = Notificacao()
         self.bot_token = config['bot_token']
-        self.ngrok_url = config['ngrok_url']
         self.base_url = f"https://api.telegram.org/bot{self.bot_token}/"
         self.buy_automation = PichauAutomator()
 
+
+
+    def get_ngrok_url(self):
+        try:
+            ngrok_api_url = "http://localhost:4040/api/tunnels"  # URL da API do Ngrok
+            response = requests.get(ngrok_api_url)
+            if response.status_code == 200:
+                data = response.json()
+                tunnels = data['tunnels']
+                for tunnel in tunnels:
+                    if tunnel['proto'] == 'https':
+                        return tunnel['public_url']
+            else:
+                print("Falha ao obter informações do Ngrok.")
+        except requests.RequestException as e:
+            print(f"Erro ao acessar a API do Ngrok: {e}")
+        return None
+
     def configure_webhook(self, url):
-        webhook_url = f"{self.base_url}setWebhook?url={url}"
+        webhook_url = f"{self.base_url}setWebhook?url={url}/resposta_telegram"
         try:
             response = requests.get(webhook_url, verify=True)  # Verificar SSL
             if response.status_code == 200:
@@ -57,9 +77,23 @@ class TelegramBot:
     def notify_user(self, chat_id, message):
         self.notify.enviar_mensagem(chat_id, message)
 
+
+    def run_ngrok(self):
+        try:
+            subprocess.Popen(["ngrok", "http", "5000"])
+            time.sleep(2)  # Aguarda um pouco para o Ngrok iniciar completamente
+            print("Ngrok iniciado na porta 5000.")
+        except FileNotFoundError:
+            print("Ngrok não encontrado. Certifique-se de que está instalado e configurado corretamente.")
+
     def run_server(self):
+        self.run_ngrok()  # Inicia o Ngrok na porta 5000
         self.app.route('/resposta_telegram', methods=['POST'])(self.handle_telegram_response)
-        self.configure_webhook(self.ngrok_url)
+        self.ngrok_url = self.get_ngrok_url()
+        if self.ngrok_url:
+            self.configure_webhook(self.ngrok_url)
+        else:
+            print("Não foi possível obter o URL do ngrok.")
         self.app.run(port=5000)
 
 

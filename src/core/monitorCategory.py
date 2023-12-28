@@ -16,7 +16,6 @@ class CategoryMonitor:
         for produto in novos_produtos:
             self.produtos[produto.link] = produto
 
-
     def run(self):
         while True:
             start_time = time.time()

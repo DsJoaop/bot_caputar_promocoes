@@ -20,7 +20,7 @@ class PichauAutomator:
             os.path.join(assets_directory, '7_termos.png'),
             #os.path.join(assets_directory, '8_finalizar_agora.png')
         ]
-        self.timeout_seconds = 10
+        self.timeout_seconds = 6
 
     def path_exists(self, image_path):
         if not os.path.exists(image_path):
