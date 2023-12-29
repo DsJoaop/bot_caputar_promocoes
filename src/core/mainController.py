@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
 from src.core.monitorCategory import CategoryMonitor
-from src.data_acess.extractData import Scraper
 
 
 class MainController:
@@ -10,12 +9,6 @@ class MainController:
         self.config = load_config()
         if self.config and 'telegram' in self.config:
             self.notificador = Notificacao()
-            self.scraper = Scraper(
-                {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                  'Chrome/58.0.3029.110 Safari/537.3'
-                }
-            )
             self.desconto_minimo = 0
         else:
             raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
@@ -31,7 +24,7 @@ class MainController:
                 " Não foi possível iniciar o monitoramento de preço.")
 
     def monitorar_categoria(self, categoria, url):
-        category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador, self.scraper)
+        category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador)
         category_monitor.run()
 
 

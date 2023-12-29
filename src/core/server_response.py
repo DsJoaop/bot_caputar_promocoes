@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request
 
 from src.bot_iteration.telegram_notify import Notificacao
 from src.config.setting_load import load_config
-from src.data_acess.extractPay import PichauAutomator
+from src.data_acess.pichauAutomator import PichauAutomator
 
 
 class TelegramBot:
@@ -25,8 +25,6 @@ class TelegramBot:
         self.bot_token = config['bot_token']
         self.base_url = f"https://api.telegram.org/bot{self.bot_token}/"
         self.buy_automation = PichauAutomator()
-
-
 
     def get_ngrok_url(self):
         try:
@@ -59,24 +57,22 @@ class TelegramBot:
         data = request.json  # Movendo a obtenção dos dados para dentro do método
         if data and 'callback_query' in data:
             resposta = data['callback_query']['data']
-            chat_id = data['callback_query']['message']['chat']['id']
-            mensagem = data['callback_query']['message']['text']
+            entities = data['callback_query']['message']['entities']
 
-            indice_inicio_link = mensagem.find('🔗 Link: ') + len('🔗 Link: ')
-            indice_final_link = mensagem.find('\n', indice_inicio_link)
-            link = mensagem[indice_inicio_link:indice_final_link]
+            link = None
+            if len(entities) > 3 and entities[3]['type'] == 'text_link':
+                link = entities[3]['url']
 
-            if resposta == "sim":
-                self.buy_automation.run_automation(link)
-                self.notify_user(chat_id, resposta)
+            if link is not None and resposta == "sim":
+                mensagem = self.buy_automation.run_automation(link)
+                self.notify_user(mensagem)
             else:
-                self.notify_user(chat_id, "Ok, compra não autorizada!")
+                self.notify_user("Ok, compra não autorizada!")
 
         return jsonify({'success': True})
 
-    def notify_user(self, chat_id, message):
-        self.notify.enviar_mensagem(chat_id, message)
-
+    def notify_user(self, message):
+        self.notify.enviar_mensagem(message)
 
     def run_ngrok(self):
         try:
