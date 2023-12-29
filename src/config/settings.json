@@ -9,12 +9,12 @@
         "Asus": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=34",
         "PNY": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?price=*_3000&rgpu=6343,6359,6584,6592,690,700,712,717,7192,7401,7426,766,767&marcas=71",
         "EVGA": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=92",
-        "Gainward": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=752",
         "Galax":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=275",
         "Mancer":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=536",
         "Gigabyte":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=36",
         "INO3D":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=7368",
         "MSI":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=121",
         "Zotac":"https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=119"
+
     }
 } 

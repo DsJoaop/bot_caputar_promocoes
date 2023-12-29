@@ -1,10 +1,9 @@
 import pyautogui
-import webbrowser
 import os
 import time
 
 
-class PichauAutomator:
+class ImageInteraction:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         parent_directory = os.path.dirname(current_directory)
@@ -15,12 +14,14 @@ class PichauAutomator:
             os.path.join(assets_directory, '2_finalizar_pedido.png'),
             os.path.join(assets_directory, '3_metodo_envio.png'),
             os.path.join(assets_directory, '4_continuar_pagamento.png'),
-            os.path.join(assets_directory, '5_boleto_bancario.png'),
+            os.path.join(assets_directory, '5_pix.png'),
             os.path.join(assets_directory, '6_continuar_revisao.png'),
             os.path.join(assets_directory, '7_termos.png'),
-            #os.path.join(assets_directory, '8_finalizar_agora.png')
+            # os.path.join(assets_directory, '8_finalizar_agora.png'),
+            # os.path.join(assets_directory, '9_copiar_pix.png'),
+            # os.path.join(assets_directory, '10_concluir.png')
         ]
-        self.timeout_seconds = 6
+        self.timeout_seconds = 2
 
     def path_exists(self, image_path):
         if not os.path.exists(image_path):
@@ -60,30 +61,3 @@ class PichauAutomator:
 
         print(f"Image path '{image_path}' not found on your screen after {self.timeout_seconds} seconds.\n")
         return False, index
-
-    def run_automation(self, url):
-        start_time = time.time()
-
-        webbrowser.open(url)
-
-        index = 0
-        while index < len(self.img_paths):
-            found, current_index = self.search_on_screen(self.img_paths[index], index)
-            if not found:
-                if current_index > 0:
-                    index = current_index - 1
-                else:
-                    print("No previous image to check. Exiting.")
-                    break
-            else:
-                index += 1
-
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"Execution time: {execution_time} seconds.")
-
-
-if __name__ == "__main__":
-    automator = PichauAutomator()
-    automator.run_automation(
-        "https://www.pichau.com.br/placa-mae-pichau-alphard-a520m-p-ddr4-socket-am4-chipset-amd-a520-pch-alpda520m-p")
