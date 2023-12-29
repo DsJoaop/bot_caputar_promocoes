@@ -28,7 +28,6 @@ def extrair_informacoes_produto(card, categoria):
 
 def fazer_scraping_produtos(url, categoria):
     try:
-        start_time = time.time()
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -41,9 +40,6 @@ def fazer_scraping_produtos(url, categoria):
                 # Se o product não puder ser extraído, saia do loop
                 break
             produtos.append(produto)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"Tempo de extração: {execution_time:.4f} segundos")
         return produtos
     except requests.RequestException as e:
         print("Falha ao obter a página:", e)
