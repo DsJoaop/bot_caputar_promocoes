@@ -10,18 +10,38 @@ class ImageInteraction:
         assets_directory = os.path.abspath(os.path.join(parent_directory, '..', 'assets', 'pichau'))
 
         self.img_paths = [
-            os.path.join(assets_directory, '1_comprar.png'),
-            os.path.join(assets_directory, '2_finalizar_pedido.png'),
-            os.path.join(assets_directory, '3_metodo_envio.png'),
-            os.path.join(assets_directory, '4_continuar_pagamento.png'),
-            os.path.join(assets_directory, '5_pix.png'),
-            os.path.join(assets_directory, '6_continuar_revisao.png'),
-            os.path.join(assets_directory, '7_termos.png'),
-            # os.path.join(assets_directory, '8_finalizar_agora.png'),
-            # os.path.join(assets_directory, '9_copiar_pix.png'),
-            # os.path.join(assets_directory, '10_concluir.png')
+            '1_comprar.png',
+            '2_finalizar_pedido.png',
+            '3_metodo_envio.png',
+            '4_continuar_pagamento.png',
+            '5_pix.png',
+            '6_continuar_revisao.png',
+            '7_termos.png',
+            # '8_finalizar_agora.png',
         ]
+        self.assets_directory = assets_directory
         self.timeout_seconds = 2
+
+    def get_image_paths(self, image_names):
+        return [os.path.join(self.assets_directory, image_name) for image_name in image_names]
+
+    def get_pix_image_paths(self):
+        img_paths_pix = self.img_paths[:]
+        img_paths_pix[4] = '5_pix.png'
+        img_paths_pix = img_paths_pix + [
+            '9_copiar_pix.png',
+            '10_concluir.png'
+        ]
+        return self.get_image_paths(img_paths_pix)
+
+    def get_boleto_image_paths(self):
+        img_paths_boleto = self.img_paths[:]
+        img_paths_boleto[4] = '5_boleto_bancario.png'
+        return self.get_image_paths(img_paths_boleto)
+
+    def add_extended_images(self, image_paths):
+        self.img_paths += image_paths
+
 
     def path_exists(self, image_path):
         if not os.path.exists(image_path):

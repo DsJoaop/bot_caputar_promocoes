@@ -43,7 +43,7 @@ class TelegramBot:
         return None
 
     def configure_webhook(self, url):
-        webhook_url = f"{self.base_url}setWebhook?url={url}/resposta_telegram"
+        webhook_url = f"{self.base_url}setWebhook?link={url}/resposta_telegram"
         try:
             response = requests.get(webhook_url, verify=True)  # Verificar SSL
             if response.status_code == 200:
@@ -61,10 +61,10 @@ class TelegramBot:
 
             link = None
             if len(entities) > 3 and entities[3]['type'] == 'text_link':
-                link = entities[3]['url']
+                link = entities[3]['link']
 
             if link is not None and resposta == "sim":
-                mensagem = self.buy_automation.run_automation(link)
+                mensagem = self.buy_automation.run_automation_pix(link)
                 self.notify_user(mensagem)
             else:
                 self.notify_user("Ok, compra não autorizada!")

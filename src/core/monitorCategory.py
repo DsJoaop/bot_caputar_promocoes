@@ -39,8 +39,13 @@ class CategoryMonitor:
                 else:
                     notification_thread = threading.Thread(
                         target=self.notificador.enviar_mensagem,
-                        args=f"Novo produto encontrado na categoria {novo_produto.link}"
+                        args=(f"ℹ️ Novo produto encontrado na categoria '{novo_produto.category}':\n\n"
+                              f"🔗 <a href='{novo_produto.link}'>Link do Produto</a>\n"
+                              f"💰 Preço: {novo_produto.price}\n\n"
+                              f"🎉 Aproveite esta novidade!",
+                              ),
                     )
+                    notification_thread.start()
                     self.produtos[link] = novo_produto
 
             end_time = time.time()

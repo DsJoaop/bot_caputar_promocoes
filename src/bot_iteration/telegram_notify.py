@@ -50,7 +50,24 @@ class Notificacao:
                 [{'text': 'Sim', 'callback_data': 'sim'}, {'text': 'Não', 'callback_data': 'nao'}]
             ]
         }
-        self.enviar_mensagem( mensagem, reply_markup)
+        self.enviar_mensagem(mensagem, reply_markup)
+
+    def enviar_alerta(self, product):
+        extrair_informacao_produto_especifico(product)
+        mensagem = (
+            f'<a href="{product.link_img}">&#8205;</a>'  # Link vazio para a imagem
+            f"<b>🎉 Novo {product.category}</b>\n\n"
+            f"<a href=\"{product.link}\">🔗 {product.nome}</a>\n\n"
+            f"💰 <b>Preço:</b> R${product.price:.2f}\n\n"
+            f"🛒 <b>Deseja comprar?!</b>\n"
+        )
+
+        reply_markup = {
+            'inline_keyboard': [
+                [{'text': 'Sim', 'callback_data': 'sim'}, {'text': 'Não', 'callback_data': 'nao'}]
+            ]
+        }
+        self.enviar_mensagem(mensagem, reply_markup)
 
 
 if __name__ == "__main__":
