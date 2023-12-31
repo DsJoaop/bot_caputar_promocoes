@@ -73,8 +73,8 @@ def criar_produto_link(link):
             # Converter para float
             valor_float = float(valor_sem_RS)
             link_produto = link
-            categoria = nome.split()[0] + ' ' + nome.split()[1]+ ' ' + nome.split()[2]
-            return Produto(link_produto, valor_float, categoria, link_img, nome)
+            categoria = nome.split()[0] + ' ' + nome.split()[1] + ' ' + nome.split()[2]
+            return Produto(link_produto, valor_float, categoria, nome, link_img)
 
     except requests.RequestException as e:
         print("Falha ao obter a página:", e)

@@ -11,33 +11,28 @@ class PichauAutomator:
         self.interaction = BuyPichauImage()
         self.notify = Notificacao()
 
-    def find_image(self, img_paths, max_retry_time=5):
-        retry_start_time = time.time()
-        index = 0
-
-        while time.time() - retry_start_time < max_retry_time and index < len(img_paths):
-            found_initial, current_index = self.interaction.search_on_screen(img_paths[index], 0)
-
-            if found_initial:
-                index += 1
-            else:
-                print(f"{index} imagem não encontrada. Tentando novamente...")
-                time.sleep(0.3)
-
-        print("Não foi possível encontrar a primeira imagem após 30 segundos.")
-        return False
-
     def run_automation(self, link, img_paths):
         start_time = time.time()
         webbrowser.open(link)
-        self.interaction.img_paths = img_paths
+        current_index = 0
+        max_attempts = 3  # Número máximo de tentativas
+        total_image_found = 0
 
-        if self.find_image(img_paths):
-            end_time = time.time()
-            execution_time = end_time - start_time
-            return False, execution_time
+        while current_index < len(img_paths) and max_attempts > 0:
+            current_image_path = img_paths[current_index]
+            found, next_index = self.interaction.search_on_screen(current_image_path, current_index)
 
-        return False, 0
+            if found:
+                total_image_found += 1
+                time.sleep(3)  # Aguarda um tempo antes de prosseguir
+
+            current_index = next_index if found else max(current_index - 1, 0)
+            max_attempts -= 1 if not found else 0
+
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        return total_image_found == len(img_paths), execution_time
 
     def run_remove(self, link):
         webbrowser.open(link)
@@ -77,17 +72,17 @@ class PichauAutomator:
                 "Por favor, tente novamente."
             )
 
-            self.notify.enviar_mensagem(message)
-            success = self.run_remove(link)
+        self.notify.enviar_mensagem(message)
+        success = self.run_remove(link)
 
-            if success:
-                message += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
-                self.notify.enviar_mensagem(message)
-            else:
-                message += "\n\n❌ A automação de limpeza falhou ❌\n\n"
-                self.notify.enviar_mensagem(message)
+        if success:
+            message += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
+        else:
+            message += "\n\n❌ A automação de limpeza falhou ❌\n\n"
 
         print(f"Tempo de execução: {execution_time} segundos.")
+
+        self.notify.enviar_mensagem(message)
         return message
 
     def run_automation_boleto(self, link):
@@ -100,9 +95,19 @@ class PichauAutomator:
         else:
             message = "❌ Ooops! Algo deu errado com o pagamento por boleto. ❌"
             print("Falha no processamento do pagamento por boleto. Tente novamente.")
-            self.notify.enviar_mensagem(message)
             self.run_remove(link)
 
+        self.notify.enviar_mensagem(message)
+        success = self.run_remove(link)
+
+        if success:
+            message += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
+        else:
+            message += "\n\n❌ A automação de limpeza falhou ❌\n\n"
+
+        print(f"Tempo de execução: {execution_time} segundos.")
+
+        self.notify.enviar_mensagem(message)
         print(f"Tempo de execução: {execution_time} segundos.")
         return message
 

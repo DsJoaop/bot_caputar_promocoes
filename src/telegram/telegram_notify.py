@@ -2,8 +2,7 @@ import requests
 import logging
 
 from src.config.setting_load import load_config
-from src.data_acess.scraper.extract_data_pichau import extrair_imagem_produto_pichau
-from src.model.produto import Produto
+from src.data_acess.scraper.extract_data_pichau import extrair_imagem_produto_pichau, criar_produto_link
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +72,6 @@ class Notificacao:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     notify = Notificacao()
-    produto = Produto("https://www.pichau.com.br/cabo-extensor-premium-24p-pichau-ps100-rgb-240mm-branco-pch-ps100-24prgbwht", 20, "Teclado",
-                      "Openbox teclado multi basico slim usb preto tc065")
+    produto = criar_produto_link("https://www.pichau.com.br/cabo-extensor-premium-24p-pichau-ps100-rgb-240mm-branco"
+                                 "-pch-ps100-24prgbwht")
     notify.enviar_notificacao(produto, 50, 30)
