@@ -1,5 +1,5 @@
 import unittest
-from src.data_acess.extractData import Scraper  # Importe a classe Scraper
+from src.data_acess.scraper.extract_data_pichau import Scraper  # Importe a classe Scraper
 
 
 class TestScraper(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestScraper(unittest.TestCase):
         categoria = 'categoria_de_teste'  # Categoria fictícia para o teste
 
         # Teste se o scraping é bem-sucedido após o login
-        produtos = self.scraper.fazer_scraping_produtos(url, categoria)
+        produtos = self.scraper.scraping_produtos_pichau(url, categoria)
         self.assertIsNotNone(produtos)  # Verifica se a lista de produtos não está vazia
 
 if __name__ == '__main__':

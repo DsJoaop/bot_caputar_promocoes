@@ -1,5 +1,3 @@
-import time
-
 import requests
 from bs4 import BeautifulSoup
 from src.model.produto import Produto
@@ -11,22 +9,24 @@ headers = {
 }
 
 
-def extrair_informacoes_produto(card, categoria):
+def extrair_cards(card):
     link_produto = card.get('href')
     preco_element = card.find(lambda tag: tag.name == 'div' and tag.get_text().strip().startswith('R$'))
-
+    nome_tag = card.find('h2', class_='MuiTypography-root')
     if preco_element:
         valor_texto = preco_element.get_text().strip()
         valor_sem_RS = re.sub(r'[^\d.]', '', valor_texto)
         # Converter para float
         valor_float = float(valor_sem_RS)
         link_produto = f"https://www.pichau.com.br{link_produto.replace("'", '')}"
-        return Produto(link_produto, valor_float, categoria)
+        nome = nome_tag.get_text()
+        categoria = nome.split()[0] + ' ' + nome.split()[1] + ' ' + nome.split()[2]
+        return Produto(link_produto, valor_float, categoria, nome)
 
     return None
 
 
-def fazer_scraping_produtos(url, categoria):
+def scraping_produtos_pichau(url):
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
@@ -35,7 +35,7 @@ def fazer_scraping_produtos(url, categoria):
 
         produtos = []
         for card in cards:
-            produto = extrair_informacoes_produto(card, categoria)
+            produto = extrair_cards(card)
             if produto is None:
                 # Se o product não puder ser extraído, saia do loop
                 break
@@ -46,14 +46,35 @@ def fazer_scraping_produtos(url, categoria):
         return []
 
 
-def extrair_informacao_produto_especifico(produto):
+def extrair_imagem_produto_pichau(produto):
     try:
         response = requests.get(produto.link, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-        # Supondo que 'product' já está instanciado como um objeto da classe Produto
         produto.link_img = soup.find('figure', class_='iiz').find('img').get('src')
-        produto.nome = soup.find('figure', class_='iiz').find('img').get('alt')
+
+    except requests.RequestException as e:
+        print("Falha ao obter a página:", e)
+
+
+def criar_produto_link(link):
+    try:
+        response = requests.get(link, headers=headers, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        link_img = soup.find('figure', class_='iiz').find('img').get('src')
+        nome = soup.find('figure', class_='iiz').find('img').get('alt')
+
+        preco_element = soup.find(lambda tag: tag.name == 'div' and tag.get_text().strip().startswith('R$'))
+
+        if preco_element:
+            valor_texto = preco_element.get_text().strip()
+            valor_sem_RS = re.sub(r'[^\d.]', '', valor_texto)
+            # Converter para float
+            valor_float = float(valor_sem_RS)
+            link_produto = link
+            categoria = nome.split()[0] + ' ' + nome.split()[1]+ ' ' + nome.split()[2]
+            return Produto(link_produto, valor_float, categoria, link_img, nome)
 
     except requests.RequestException as e:
         print("Falha ao obter a página:", e)

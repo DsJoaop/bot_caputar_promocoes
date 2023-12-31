@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
-from src.bot_iteration.telegram_notify import Notificacao
+from src.telegram.telegram_notify import Notificacao
 from src.config.setting_load import load_config
-from src.core.monitorCategory import CategoryMonitor
+from src.core.monitor_pichau_category import CategoryMonitor
 
 
 class MainController:

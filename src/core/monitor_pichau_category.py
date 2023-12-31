@@ -2,7 +2,7 @@ import random
 import threading
 import time
 
-from src.data_acess.extractData import fazer_scraping_produtos
+from src.data_acess.scraper.extract_data_pichau import scraping_produtos_pichau
 
 
 class CategoryMonitor:
@@ -11,10 +11,10 @@ class CategoryMonitor:
         self.url = url
         self.desconto_minimo = desconto_minimo
         self.notificador = notificador
-        self.produtos = {}  # Dicionário para armazenar link: objeto Produto
+        self.produtos = {}
 
         # Primeira execução para definir produtos iniciais
-        novos_produtos = fazer_scraping_produtos(self.url, self.categoria)
+        novos_produtos = scraping_produtos_pichau(self.url)
         for produto in novos_produtos:
             self.produtos[produto.link] = produto
 
@@ -22,7 +22,7 @@ class CategoryMonitor:
         while True:
             start_time = time.time()
 
-            novos_produtos = fazer_scraping_produtos(self.url, self.categoria)
+            novos_produtos = scraping_produtos_pichau(self.url)
 
             for novo_produto in novos_produtos:
                 link = novo_produto.link
@@ -39,7 +39,7 @@ class CategoryMonitor:
                 else:
                     notification_thread = threading.Thread(
                         target=self.notificador.enviar_alerta,
-                        args=novo_produto,
+                        kwargs={'product': novo_produto}  # Passando o argumento como um argumento nomeado
                     )
                     notification_thread.start()
                     self.produtos[link] = novo_produto

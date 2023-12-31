@@ -3,7 +3,7 @@ import os
 import time
 
 
-class ImageInteraction:
+class BuyPichauImage:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         parent_directory = os.path.dirname(current_directory)
@@ -12,12 +12,13 @@ class ImageInteraction:
         self.img_paths = [
             '1_comprar.png',
             '2_finalizar_pedido.png',
+
             '3_metodo_envio.png',
             '4_continuar_pagamento.png',
             '5_pix.png',
             '6_continuar_revisao.png',
             '7_termos.png',
-            # '8_finalizar_agora.png',
+            #'8_finalizar_agora.png',
         ]
         self.assets_directory = assets_directory
         self.timeout_seconds = 2
@@ -39,9 +40,17 @@ class ImageInteraction:
         img_paths_boleto[4] = '5_boleto_bancario.png'
         return self.get_image_paths(img_paths_boleto)
 
+    def get_cart_image_paths(self):
+        img_paths_cart = [
+            '20_carrinho.png',
+            '21_limpar_carrinho.png',
+            '22_confirmar_limpeza.png',
+            '23_nenhum_produto.png'
+        ]
+        return self.get_image_paths(img_paths_cart)
+
     def add_extended_images(self, image_paths):
         self.img_paths += image_paths
-
 
     def path_exists(self, image_path):
         if not os.path.exists(image_path):
