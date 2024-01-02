@@ -65,7 +65,7 @@ class BuyPichauImage:
             return y
 
     def wait(self, image_path):
-        if image_path in [self.img_paths[3], self.img_paths[5]]:
+        if image_path in [self.img_paths[3], self.img_paths[4]]:
             time.sleep(0.9)
 
     def search_on_screen(self, image_path, index):
@@ -77,14 +77,14 @@ class BuyPichauImage:
 
         while time.time() - start_time < self.timeout_seconds:
             try:
-                x, y = pyautogui.locateCenterOnScreen(image_path, confidence=0.8)
+                x, y = pyautogui.locateCenterOnScreen(image_path, confidence=0.82)
                 y = self.verify_image(image_path, y)
                 pyautogui.click(x, y)
                 print("\n-----------------------------------------------------")
                 print(f"{image_path} found.")
                 print("-----------------------------------------------------\n")
 
-                return True, index
+                return True, index +1
             except pyautogui.ImageNotFoundException:
                 print(f"Searching for {image_path}...")
 

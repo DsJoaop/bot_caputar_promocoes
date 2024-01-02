@@ -11,11 +11,10 @@ class PichauAutomator:
         self.interaction = BuyPichauImage()
         self.notify = Notificacao()
 
-    def run_automation(self, link, img_paths):
+    def run_automation(self, link, img_paths, max_attempts=3):
         start_time = time.time()
         webbrowser.open(link)
         current_index = 0
-        max_attempts = 3  # Número máximo de tentativas
         total_image_found = 0
 
         while current_index < len(img_paths) and max_attempts > 0:
@@ -24,7 +23,7 @@ class PichauAutomator:
 
             if found:
                 total_image_found += 1
-                time.sleep(3)  # Aguarda um tempo antes de prosseguir
+                time.sleep(0.2)
 
             current_index = next_index if found else max(current_index - 1, 0)
             max_attempts -= 1 if not found else 0
@@ -51,7 +50,6 @@ class PichauAutomator:
             else:
                 time.sleep(3)
                 index += 1
-
         return index >= 2
 
     def run_automation_pix(self, link):
@@ -73,16 +71,16 @@ class PichauAutomator:
             )
 
         self.notify.enviar_mensagem(message)
-        success = self.run_remove(link)
+        #success = self.run_remove(link)
 
         if success:
-            message += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
+            message = "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
         else:
-            message += "\n\n❌ A automação de limpeza falhou ❌\n\n"
+            message = "\n\n❌ A automação de limpeza falhou ❌\n\n"
 
         print(f"Tempo de execução: {execution_time} segundos.")
 
-        self.notify.enviar_mensagem(message)
+        #self.notify.enviar_mensagem(message)
         return message
 
     def run_automation_boleto(self, link):
@@ -101,9 +99,9 @@ class PichauAutomator:
         success = self.run_remove(link)
 
         if success:
-            message += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
+            message = "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
         else:
-            message += "\n\n❌ A automação de limpeza falhou ❌\n\n"
+            message = "\n\n❌ A automação de limpeza falhou ❌\n\n"
 
         print(f"Tempo de execução: {execution_time} segundos.")
 

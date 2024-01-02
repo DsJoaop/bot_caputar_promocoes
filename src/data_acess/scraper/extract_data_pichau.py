@@ -57,7 +57,7 @@ def extrair_imagem_produto_pichau(produto):
         print("Falha ao obter a página:", e)
 
 
-def criar_produto_link(link):
+def criar_produto_link_pichau(link):
     try:
         response = requests.get(link, headers=headers, timeout=10)
         response.raise_for_status()
@@ -78,3 +78,20 @@ def criar_produto_link(link):
 
     except requests.RequestException as e:
         print("Falha ao obter a página:", e)
+
+
+def listar_produtos(links):
+    produtos = []
+    for link in links:
+        produto = criar_produto_link_pichau(link)
+        if produto:
+            produtos.append(produto)
+    return produtos
+
+
+def formatar_mensagem(produtos):
+    mensagem = ""
+    for produto in produtos:
+        mensagem += f"Nome: {produto.nome}\n"
+        mensagem += f"Categoria: {produto.category}\n"
+    return mensagem

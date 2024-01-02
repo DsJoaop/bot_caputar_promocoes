@@ -2,7 +2,7 @@ import requests
 import logging
 
 from src.config.setting_load import load_config
-from src.data_acess.scraper.extract_data_pichau import extrair_imagem_produto_pichau, criar_produto_link
+from src.data_acess.scraper.extract_data_pichau import extrair_imagem_produto_pichau, criar_produto_link_pichau
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,6 @@ class Notificacao:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     notify = Notificacao()
-    produto = criar_produto_link("https://www.pichau.com.br/cabo-extensor-premium-24p-pichau-ps100-rgb-240mm-branco"
+    produto = criar_produto_link_pichau("https://www.pichau.com.br/cabo-extensor-premium-24p-pichau-ps100-rgb-240mm-branco"
                                  "-pch-ps100-24prgbwht")
     notify.enviar_notificacao(produto, 50, 30)
