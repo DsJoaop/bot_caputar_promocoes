@@ -33,7 +33,6 @@ class Notificacao:
             logger.exception(f"Erro ao enviar mensagem: {e}")
 
     def enviar_notificacao(self, product, previous_price, discount):
-        extrair_imagem_produto_pichau(product)
         mensagem = (
             f'<a href="{product.link_img}">&#8205;</a>'  # Link vazio para a imagem
             f"<a href=\"{product.link}\">🔗 {product.nome}</a>\n\n"

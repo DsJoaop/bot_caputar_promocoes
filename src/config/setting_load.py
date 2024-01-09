@@ -24,13 +24,14 @@ def load_config():
         return None
 
 
-def add_produto_desejo(product_link):
+def add_produto_desejo(product_link, max_price):
     config = load_config()
     if config is not None:
         if "desejos" not in config:
             config["desejos"] = []
 
-        config["desejos"].append(product_link)
+        novo_produto = {"link": product_link, "max_price": max_price}
+        config["desejos"].append(novo_produto)
 
         script_dir = os.path.dirname(__file__)
         file_path = os.path.join(script_dir, 'settings.json')
@@ -38,7 +39,7 @@ def add_produto_desejo(product_link):
         try:
             with open(file_path, 'w') as config_file:
                 json.dump(config, config_file, indent=4)
-            logger.info(f"Link '{product_link}' adicionado à lista de desejos.")
+            logger.info(f"Link '{product_link}' adicionado à lista de desejos com preço máximo de {max_price}.")
         except Exception as e:
             logger.error(f"Erro ao salvar alterações no arquivo de configuração: {e}")
 
@@ -51,17 +52,11 @@ def get_lista_desejos():
         return []
 
 
-def main():
-    # Adicionando produtos à lista de desejos
-    add_produto_desejo("https://www.pichau.com.br/cadeira-office-zinnia-zurich-preto-zno-zrc-bk")
-    add_produto_desejo("https://www.pichau.com.br/monitor-gamer-pichau-cepheus-fuse-vpro49-ultra-49-pol-nano-ips-2k-1ms-144hz-freesync-hdmi-dp-pg-cfvfs49u-bl01")
+def carregar_produtos_desejados_pichau():
     links = get_lista_desejos()
     if links is not None:
         produtos = listar_produtos(links)
-        send_mensage(formatar_mensagem(produtos))
+        return produtos
     else:
         send_mensage("Erro ao carregar lista de desejo")
-
-
-if __name__ == "__main__":
-    main()
+        return []

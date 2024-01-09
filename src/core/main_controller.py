@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
+
 from src.telegram.telegram_notify import Notificacao
-from src.config.setting_load import load_config
+from src.config.setting_load import load_config, carregar_produtos_desejados_pichau
 from src.core.monitor_pichau_category import CategoryMonitor
 
 
@@ -10,6 +11,7 @@ class MainController:
         if self.config and 'telegram' in self.config:
             self.notificador = Notificacao()
             self.desconto_minimo = 0
+            self.lista_desejo = carregar_produtos_desejados_pichau()
         else:
             raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
 
@@ -24,7 +26,7 @@ class MainController:
                 " Não foi possível iniciar o monitoramento de preço.")
 
     def monitorar_categoria(self, categoria, url):
-        category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador)
+        category_monitor = CategoryMonitor(categoria, url, self.desconto_minimo, self.notificador, self.lista_desejo)
         category_monitor.run()
 
 
