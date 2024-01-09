@@ -40,6 +40,7 @@ class CategoryMonitor:
                     target=self.notificador.enviar_mensagem,
                     args=(criar_produto_link_pichau(produto.link), mensagem)
                 )
+
                 notification_thread.start()
                 return
         # Se não for um produto desejado ou não houver desconto, apenas envie a notificação
