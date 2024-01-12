@@ -11,7 +11,7 @@ class PichauAutomator:
         self.interaction = BuyPichauImage()
         self.notify = Notificacao()
 
-    def run_automation(self, link, img_paths, max_attempts=3):
+    def run_buy(self, link, img_paths, max_attempts=3):
         start_time = time.time()
         webbrowser.open(link)
         current_index = 0
@@ -52,62 +52,35 @@ class PichauAutomator:
                 index += 1
         return index >= 2
 
-    def run_automation_pix(self, link):
-        img_paths_pix = self.interaction.get_pix_image_paths()
-        success, execution_time = self.run_automation(link, img_paths_pix)
+    def run_automation(self, link, img_paths):
+        success, execution_time = self.run_buy(link, img_paths)
 
         if success:
-            pix_content = pyperclip.paste()
-            message = (
-                f"<b>🎉 Compra realizada com sucesso! 🎉</b>\n\n"
-                f"<b>ℹ️ Copie o código PIX:</b> <code>{pix_content}</code>\n\n"
-            )
-
+            content = pyperclip.paste()
+            message = f"<b>🎉 Compra realizada com sucesso! 🎉</b>\n\n<b>ℹ️ Copie o código:</b> <code>{content}</code>\n\n"
         else:
-            message = (
-                "❌ Ooops! Algo deu errado. ❌\n\n"
-                "Não foi possível gerar o código PIX devido a uma falha na automatização de compra. \n"
-                "Por favor, tente novamente."
-            )
+            message = ("❌ Ooops! Algo deu errado. ❌\n\nNão foi possível gerar o código devido a uma falha na "
+                       "automatização de compra. Por favor, tente novamente.")
 
         self.notify.enviar_mensagem(message)
-        #success = self.run_remove(link)
+        success_remove = self.run_remove(link)
 
-        if success:
-            message = "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
+        if success_remove:
+            message_remove = "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
         else:
-            message = "\n\n❌ A automação de limpeza falhou ❌\n\n"
+            message_remove = "\n\n❌ A automação de limpeza falhou ❌\n\n"
 
         print(f"Tempo de execução: {execution_time} segundos.")
-
-        #self.notify.enviar_mensagem(message)
+        self.notify.enviar_mensagem(message_remove)
         return message
+
+    def run_automation_pix(self, link):
+        img_paths_pix = self.interaction.get_pix_image_paths()
+        return self.run_automation(link, img_paths_pix)
 
     def run_automation_boleto(self, link):
         img_paths_boleto = self.interaction.get_boleto_image_paths()
-        success, execution_time = self.run_automation(link, img_paths_boleto)
-
-        if success:
-            message = "🎉 Pagamento por boleto processado com sucesso! 🎉"
-            print("Pagamento por boleto concluído.")
-        else:
-            message = "❌ Ooops! Algo deu errado com o pagamento por boleto. ❌"
-            print("Falha no processamento do pagamento por boleto. Tente novamente.")
-            self.run_remove(link)
-
-        self.notify.enviar_mensagem(message)
-        success = self.run_remove(link)
-
-        if success:
-            message = "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
-        else:
-            message = "\n\n❌ A automação de limpeza falhou ❌\n\n"
-
-        print(f"Tempo de execução: {execution_time} segundos.")
-
-        self.notify.enviar_mensagem(message)
-        print(f"Tempo de execução: {execution_time} segundos.")
-        return message
+        return self.run_automation(link, img_paths_boleto)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,6 @@ def extrair_card_completo(card, max_price=None):
     if preco_element:
         valor_texto = preco_element.get_text().strip()
         valor_sem_RS = re.sub(r'[^\d.]', '', valor_texto)
-        # Converter para float
         valor_float = float(valor_sem_RS)
         link_produto = f"https://www.pichau.com.br{link_produto.replace("'", '')}"
         nome = nome_tag.get_text()

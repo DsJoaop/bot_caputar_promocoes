@@ -1,8 +1,8 @@
 import random
 import time
-from copy import deepcopy
 from src.data_acess.buy_pichau import PichauAutomator
 from src.data_acess.scraper.extract_data_pichau import scraping_produtos_pichau, criar_produto_link_pichau
+from copy import deepcopy
 
 
 class CategoryMonitor:
@@ -21,17 +21,17 @@ class CategoryMonitor:
 
     def verificar_desconto_produto_desejado(self, produto, preco_anterior, discount):
         if produto.link in self.produtos_desejados:
-            produto_anterior = self.produtos.get(produto.link)
-            if produto_anterior and produto.price <= produto_anterior.max_price:
+            produto_desejado = self.produtos.get(produto.link)
+            if produto_desejado and produto.price <= produto_desejado.max_price:
                 self.notificador.enviar_compra_confirmada(
-                    criar_produto_link_pichau(produto.link),
+                    produto,
                     preco_anterior,
                     discount
                 )
                 self.automator.run_automation_boleto(produto.link)
                 return
         self.notificador.enviar_notificacao(
-            criar_produto_link_pichau(produto.link), preco_anterior, discount
+            produto, preco_anterior, discount
         )
         self.produtos[produto.link] = produto
 
