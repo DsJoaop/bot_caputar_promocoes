@@ -2,7 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from src.telegram.telegram_notify import Notificacao
 from src.config.setting_load import load_config, carregar_produtos_desejados_pichau
-from src.core.monitor_pichau_category import CategoryMonitor
+from src.core.monitor_category import CategoryMonitor
 
 
 class MainController:

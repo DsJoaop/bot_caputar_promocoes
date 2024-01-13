@@ -1,4 +1,6 @@
+import random
 import time
+from copy import deepcopy
 from src.data_acess.buy_pichau import PichauAutomator
 from src.data_acess.scraper.extract_data_pichau import scraping_produtos_pichau, criar_produto_link_pichau
 
@@ -36,31 +38,27 @@ class CategoryMonitor:
     def run(self):
         while True:
             start_time = time.time()
-
-            # Perform scraping and obtain the latest products
             novos_produtos = scraping_produtos_pichau(self.url)
 
-            # Check for new products and add them to the existing ones
+            produtos_copia = deepcopy(self.produtos)
             for novo_produto in novos_produtos:
                 link = novo_produto.link
-                if link not in self.produtos:
-                    self.produtos[link] = novo_produto
-                    self.notificador.enviar_alerta(criar_produto_link_pichau(link))
-
-            # Iterate through all products and check for price drops
-            for produto_link, produto in self.produtos.items():
-                produto_anterior = self.produtos.get(produto_link)
-                if produto_anterior and produto.price < produto_anterior.price:
-                    discount = ((produto_anterior.price - produto.price) / produto_anterior.price) * 100
-                    self.verificar_desconto_produto_desejado(
-                        criar_produto_link_pichau(produto.link),
-                        produto_anterior.price,
-                        discount
+                if link in produtos_copia:
+                    produto_anterior = produtos_copia[link]
+                    discount = ((produto_anterior.price - novo_produto.price) / produto_anterior.price) * 100
+                    if discount > 0:
+                        self.verificar_desconto_produto_desejado(
+                            criar_produto_link_pichau(novo_produto.link),
+                            produto_anterior.price,
+                            discount
+                        )
+                else:
+                    self.notificador.enviar_alerta(
+                        criar_produto_link_pichau(novo_produto.link)
                     )
+                    self.produtos[link] = novo_produto
 
             end_time = time.time()
             execution_time = end_time - start_time
             print(f"Analisando {self.categoria}... Tempo de execução: {execution_time:.4f} segundos")
-            time.sleep(1)
-
-
+            time.sleep(random.uniform(30, 100))
