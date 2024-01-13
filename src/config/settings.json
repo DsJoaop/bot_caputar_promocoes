@@ -4,14 +4,9 @@
         "chat_id": "2145296654"
     },
     "categorias": {
-        "Mancer, Asus, Duex, EVGA, Gainward, INNO3D, PCYES e PNY ": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=34,536,6350,71,7368,752,79,92",
-        "Galaxy, Gigabyte": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=275,36",
-        "MSI e Zotac": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=119,121",
-        "Processador AM4": "https://www.pichau.com.br/hardware?socket=539&plataforma=7",
-        "Processador AM5": "https://www.pichau.com.br/hardware?socket=6689&plataforma=7",
-        "Placa M\u00c3\u00a3e AM4 AM5 DDR5": "https://www.pichau.com.br/hardware/placa-m-e?socket=539,6689&tipo_de_memoria=6389",
+        "Placa AM4 AM5 DDR5": "https://www.pichau.com.br/hardware/placa-m-e?socket=539,6689&tipo_de_memoria=6389",
         "Monitores 27+": "https://www.pichau.com.br/monitores/monitores-gamer?tamanho_da_tela=6413&tipo_de_painel=6416",
-        "Monitores escrit\u00c3\u00b3rio": "https://www.pichau.com.br/monitores/monitor-casa-e-escritorio?tipo_de_painel=6416,6418"
+        "Monitores escritorio": "https://www.pichau.com.br/monitores/monitor-casa-e-escritorio?tipo_de_painel=6416,6418"
     },
     "desejos": [
         {

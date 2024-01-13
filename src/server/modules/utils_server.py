@@ -93,6 +93,7 @@ class Utils:
             user_states[chat_id]['state'] = 'Aguardando_links'
         else:
             notify_user("Termine o processo anterior para ver a lista de desejos!")
+
     @staticmethod
     def handle_waiting_links(user_states, chat_id, notify_user, data):
         message = data['message']['text']
