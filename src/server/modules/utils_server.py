@@ -65,6 +65,7 @@ class Utils:
         else:
             notify_user("Termine o processo anterior para ver a lista de ajuda!")
 
+
     @staticmethod
     def handle_list_desejos_command(user_states, chat_id, notify_user, message=None):
         user_state = user_states.get(chat_id, {}).get('state')
