@@ -3,10 +3,12 @@ import time
 import requests
 
 from src.config.setting_load import get_lista_desejos, add_produto_desejo
+from src.data_acess.buy_pichau import PichauAutomator
 from src.data_acess.scraper.extract_data_pichau import listar_produtos, formatar_mensagem
 
 
 class Utils:
+
     @staticmethod
     def get_ngrok_url():
         try:
@@ -64,7 +66,6 @@ class Utils:
             notify_user(help_message)
         else:
             notify_user("Termine o processo anterior para ver a lista de ajuda!")
-
 
     @staticmethod
     def handle_list_desejos_command(user_states, chat_id, notify_user, message=None):
@@ -135,7 +136,6 @@ class Utils:
             notify_user("Houve um erro ao processar as entradas. Por favor, tente novamente mais tarde.")
             print(e)  # Apenas para depuração, pode ser removido em ambiente de produção
 
-
     @staticmethod
     def handle_other_state(user_states, chat_id, notify_user, message):
         # Lógica para outro estado de espera
@@ -147,13 +147,8 @@ class Utils:
         if user_state in Utils.estado_espera:
             handler = Utils.estado_espera[user_state]
             handler(user_states, chat_id, notify_user, message)
-        else:
-            # Lógica para outros estados ou nenhum estado específico
-            pass
 
     estado_espera = {
         'Aguardando_links': handle_waiting_links,
         'Estado_erro': handle_other_state
     }
-
-

@@ -77,7 +77,19 @@ class TelegramBot:
                     break
             else:
                 Utils.handle_process_command(self.user_states, chat_id, self.notify_user, data)
+        else:
+            resposta = data['callback_query']['data']
+            entities = data['callback_query']['message']['entities']
 
+            link = None
+            if len(entities) > 3 and entities[1]['type'] == 'text_link':
+                link = entities[1]['url']
+
+            if link is not None and resposta == "sim":
+                mensagem = self.buy_automation.run_automation_pix(link)
+                self.notify_user(mensagem)
+            else:
+                self.notify_user("Ok, compra não autorizada!")
         return jsonify({'success': True})
 
 
