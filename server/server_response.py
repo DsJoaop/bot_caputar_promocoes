@@ -1,21 +1,11 @@
-import time
-
 import requests
 from flask import Flask, jsonify, request
-from multiprocessing import Process
 
 from config.setting_load import load_config
 from server.modules.commands import *
 from server.modules.ngrok_config import run_ngrok, get_ngrok_url
-from src.core.controller_monitor import ControllerMonitor
 from src.share.buy_pichau.buy_pichau import PichauAutomator
 from src.share.telegram.telegram_notify import Notificacao
-
-
-def run_monitoring():
-    controller = ControllerMonitor()
-    controller.dividir_categorias()
-
 
 class TelegramBot:
 
@@ -73,7 +63,6 @@ class TelegramBot:
             link = None
             if len(entities) > 3 and entities[1]['type'] == 'text_link':
                 link = entities[1]['url']
-
             if link is not None and resposta == "sim":
                 mensagem = self.buy_automation.run_automation_pix(link)
                 self.notify_user(mensagem)
@@ -90,28 +79,9 @@ class TelegramBot:
         else:
             print("Não foi possível obter o URL do ngrok.")
 
-        # Iniciar o subprocesso para o monitoramento
-        monitor_process = Process(target=run_monitoring)
-        monitor_process.start()
-
         self.app.run(port=5000)
 
 
 if __name__ == "__main__":
-    controller = ControllerMonitor()
-
-    # Inicia o monitoramento em uma thread separada
-    controller.iniciar_monitoramento()
-
-    time.sleep(20)  # Por exemplo, 20 segundos
-
-    # Para o monitoramento
-    controller.parar_monitoramento()
-
-    # Espera um pouco mais...
-    time.sleep(10)  # Por exemplo, 10 segundos
-
-    # Reinicia o monitoramento
-    controller.reiniciar_monitoramento()
     bot = TelegramBot()
     bot.run_server()

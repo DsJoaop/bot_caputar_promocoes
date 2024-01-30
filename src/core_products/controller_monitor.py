@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
-from src.core.analyze_category import AnalyzeCategory
+from src.core_products.analyze_category import AnalyzeCategory
 from src.share.telegram.telegram_notify import Notificacao
 from config.setting_load import load_config, carregar_produtos_desejados_pichau
 

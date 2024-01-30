@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from src.model.produto_completo import Produto
+from src.model.produto import Produto
 import re
 
 headers = {

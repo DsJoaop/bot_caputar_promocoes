@@ -2,7 +2,12 @@
     "telegram": {
         "bot_token": "6474525795:AAE0REuCbl_4kxPL67IZKNAyZ-Kp1iOlYzg",
         "chat_id": "2145296654",
-        "canais_promo_id": "-1260857435, -1711010679, -1686905299, -1237760290"
+        "canais_promo_id": [
+            {"LinksBR":"-1260857435"},
+            {"BenchPromo":"-1711010679"},
+            {"Economister":"-1686905299"},
+            {"Economizanderson":"-1237760290"}
+        ]
     },
     "categorias": {
         "Mancer, Asus, Duex, EVGA, Gainward, INNO3D, PCYES e PNY ": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?rgpu=6304,6305,6343,6359,6377,6383,6584,6592,6609,6611,690,700,712,717,7185,7192,7208,7369,7383,7401,7426,748,766,767&marcas=34,536,6350,71,7368,752,79,92",

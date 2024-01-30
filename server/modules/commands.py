@@ -1,5 +1,8 @@
 from config.setting_load import get_lista_desejos, add_produto_desejo
+from src.core_products.controller_monitor import ControllerMonitor
 from src.data_acess.data_pichau import formatar_mensagem, listar_produtos
+
+controller = ControllerMonitor()
 
 
 def command_start(user_states, chat_id, notify_user, message=None):
@@ -9,6 +12,7 @@ def command_start(user_states, chat_id, notify_user, message=None):
             "Bem-vindo ao bot de monitoramento de preços! 🌟\n"
             "Digite /help para ver os comandos disponíveis."
         )
+        controller.iniciar_monitoramento()
         notify_user(welcome_message)
     else:
         notify_user("Termine o processo anterior para ver o comando!")
@@ -16,7 +20,8 @@ def command_start(user_states, chat_id, notify_user, message=None):
 
 def command_stop(user_states, chat_id, notify_user, message=None):
     user_states[chat_id]['state'] = 'stop'
-    bye_message = "Bot finalizado. Até logo!"
+    controller.parar_monitoramento()
+    bye_message = "Monitoramento pausado. Até logo!"
     notify_user(bye_message)
 
 

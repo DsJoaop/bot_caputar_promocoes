@@ -3,6 +3,7 @@ import logging
 import os
 
 from src.data_acess.extract_data_pichau import listar_produtos
+from src.model.chat import ChatTelegram
 from src.share.telegram.telegram_mensages import send_mensage
 
 logger = logging.getLogger(__name__)
@@ -60,3 +61,18 @@ def carregar_produtos_desejados_pichau():
     else:
         send_mensage("Erro ao carregar lista de desejo")
         return []
+
+
+def carregar_chats_monitorados():
+    config = load_config()
+    if config:
+        canais_promo_id_list = config.get("telegram", {}).get("canais_promo_id", [])
+        chats = []
+        for canal_info in canais_promo_id_list:
+            canal_name, canal_id = canal_info.popitem()
+            chats.append(ChatTelegram(canal_name, canal_id))
+
+    return chats
+
+
+carregar_chats_monitorados()
