@@ -2,8 +2,8 @@ import json
 import logging
 import os
 
-from src.data_acess.scraper.extract_data_pichau import listar_produtos, formatar_mensagem
-from src.telegram.telegram_mensages import send_mensage
+from src.data_acess.extract_data_pichau import listar_produtos
+from src.share.telegram.telegram_mensages import send_mensage
 
 logger = logging.getLogger(__name__)
 

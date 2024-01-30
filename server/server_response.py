@@ -1,41 +1,40 @@
-import os
+import time
+
 import requests
 from flask import Flask, jsonify, request
+from multiprocessing import Process
 
-from src.config.setting_load import load_config
-from src.data_acess.buy_pichau import PichauAutomator
-from src.server.modules.utils_server import Utils
-from src.telegram.telegram_notify import Notificacao
+from config.setting_load import load_config
+from server.modules.commands import *
+from server.modules.ngrok_config import run_ngrok, get_ngrok_url
+from src.core.controller_monitor import ControllerMonitor
+from src.share.buy_pichau.buy_pichau import PichauAutomator
+from src.share.telegram.telegram_notify import Notificacao
+
+
+def run_monitoring():
+    controller = ControllerMonitor()
+    controller.dividir_categorias()
 
 
 class TelegramBot:
-    main_controller_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'core', 'main_controller.py'))
 
     def __init__(self):
-        self.user_states = None
-        self.buy_automation = None
-        self.base_url = None
-        self.ngrok_url = None
-        self.notify = None
-        self.bot_token = None
-        self.commands = None
-        self.app = Flask(__name__)
-        self.setup_bot()
-
-    def setup_bot(self):
         config = load_config()['telegram']
-        self.notify = Notificacao()
-        self.bot_token = config['bot_token']
-        self.base_url = f"https://api.telegram.org/bot{self.bot_token}/"
-        self.buy_automation = PichauAutomator()
-        self.commands = {
-            '/start': Utils.handle_start_command,
-            '/stop': Utils.handle_stop_command,
-            '/help': Utils.handle_help_command,
-            '/list_desejos': Utils.handle_list_desejos_command,
-            '/add_desejos': Utils.handle_add_desejos_command
-        }
         self.user_states = {}
+        self.bot_token = config['bot_token']
+        self.buy_automation = PichauAutomator()
+        self.base_url = f"https://api.telegram.org/bot{self.bot_token}/"
+        self.ngrok_url = None
+        self.notify = Notificacao()
+        self.commands = {
+            '/start': command_start,
+            '/stop': command_stop,
+            '/help': command_help,
+            '/list_desejos': command_list_desejos,
+            '/add_desejos': command_add_list_desejos
+        }
+        self.app = Flask(__name__)
 
     def notify_user(self, message):
         self.notify.enviar_mensagem(message)
@@ -51,17 +50,7 @@ class TelegramBot:
         except requests.RequestException as e:
             print(f"Erro ao configurar o webhook: {e}")
 
-    def run_server(self):
-        Utils.run_ngrok()  # Inicia o Ngrok na porta 5000
-        self.app.route('/resposta_telegram', methods=['POST'])(self.handle_telegram_response)
-        self.ngrok_url = Utils.get_ngrok_url()
-        if self.ngrok_url:
-            self.configure_webhook(self.ngrok_url)
-        else:
-            print("Não foi possível obter o URL do ngrok.")
-        self.app.run(port=5000)
-
-    def handle_telegram_response(self):
+    def process_command_telegram(self):
         data = request.json
 
         if data and 'message' in data and 'text' in data['message']:
@@ -76,7 +65,7 @@ class TelegramBot:
                     handler(self.user_states, chat_id, self.notify_user, data)
                     break
             else:
-                Utils.handle_process_command(self.user_states, chat_id, self.notify_user, data)
+                command_process(self.user_states, chat_id, self.notify_user, data)
         else:
             resposta = data['callback_query']['data']
             entities = data['callback_query']['message']['entities']
@@ -92,7 +81,37 @@ class TelegramBot:
                 self.notify_user("Ok, compra não autorizada!")
         return jsonify({'success': True})
 
+    def run_server(self):
+        run_ngrok()
+        self.app.route('/resposta_telegram', methods=['POST'])(self.process_command_telegram)
+        self.ngrok_url = get_ngrok_url()
+        if self.ngrok_url:
+            self.configure_webhook(self.ngrok_url)
+        else:
+            print("Não foi possível obter o URL do ngrok.")
+
+        # Iniciar o subprocesso para o monitoramento
+        monitor_process = Process(target=run_monitoring)
+        monitor_process.start()
+
+        self.app.run(port=5000)
+
 
 if __name__ == "__main__":
+    controller = ControllerMonitor()
+
+    # Inicia o monitoramento em uma thread separada
+    controller.iniciar_monitoramento()
+
+    time.sleep(20)  # Por exemplo, 20 segundos
+
+    # Para o monitoramento
+    controller.parar_monitoramento()
+
+    # Espera um pouco mais...
+    time.sleep(10)  # Por exemplo, 10 segundos
+
+    # Reinicia o monitoramento
+    controller.reiniciar_monitoramento()
     bot = TelegramBot()
     bot.run_server()

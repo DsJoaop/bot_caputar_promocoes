@@ -3,11 +3,18 @@ import os
 import time
 
 
+def path_exists(image_path):
+    if not os.path.exists(image_path):
+        print(f"File '{image_path}' not found.\n")
+        return False
+    return True
+
+
 class BuyPichauImage:
     def __init__(self):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         parent_directory = os.path.dirname(current_directory)
-        assets_directory = os.path.abspath(os.path.join(parent_directory, '..', 'assets', 'pichau'))
+        assets_directory = os.path.abspath(os.path.join(parent_directory, '..', '..', 'assets', 'pichau'))
 
         self.img_paths = [
             '1_comprar.png',
@@ -18,7 +25,7 @@ class BuyPichauImage:
             '5_pix.png',
             '6_continuar_revisao.png',
             '7_termos.png',
-            #'8_finalizar_agora.png',
+            # '8_finalizar_agora.png',
         ]
         self.assets_directory = assets_directory
         self.timeout_seconds = 2
@@ -52,24 +59,18 @@ class BuyPichauImage:
     def add_extended_images(self, image_paths):
         self.img_paths += image_paths
 
-    def path_exists(self, image_path):
-        if not os.path.exists(image_path):
-            print(f"File '{image_path}' not found.\n")
-            return False
-        return True
-
     def verify_image(self, image_path, y):
-        if image_path == self.img_paths[2]:
+        if os.path.basename(image_path) == self.img_paths[2]:
             return y + 55
         else:
             return y
 
     def wait(self, image_path):
-        if image_path in [self.img_paths[3], self.img_paths[4]]:
-            time.sleep(0.9)
+        if os.path.basename(image_path) in [self.img_paths[3], self.img_paths[4]]:
+            time.sleep(1.5)
 
     def search_on_screen(self, image_path, index):
-        if not self.path_exists(image_path):
+        if not path_exists(image_path):
             return False, index
 
         start_time = time.time()
@@ -84,7 +85,7 @@ class BuyPichauImage:
                 print(f"{image_path} found.")
                 print("-----------------------------------------------------\n")
 
-                return True, index +1
+                return True, index + 1
             except pyautogui.ImageNotFoundException:
                 print(f"Searching for {image_path}...")
 

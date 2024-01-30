@@ -1,8 +1,8 @@
 import requests
 import logging
 
-from src.config.setting_load import load_config
-from src.data_acess.scraper.extract_data_pichau import extrair_imagem_produto_pichau, criar_produto_link_pichau
+from config.setting_load import load_config
+from src.data_acess.extract_data_pichau import extrair_imagem_produto_pichau, criar_produto_link_pichau
 
 logger = logging.getLogger(__name__)
 

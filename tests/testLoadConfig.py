@@ -1,5 +1,5 @@
 import unittest
-from src.config.setting_load import load_config  #
+from config.setting_load import load_config  #
 
 
 class TestLoadConfig(unittest.TestCase):

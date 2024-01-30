@@ -3,8 +3,8 @@ from unittest.mock import patch
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from src.config.setting_load import load_config
-from src.telegram.telegram_notify import Notificacao
+from config.setting_load import load_config
+from src.share.telegram.telegram_notify import Notificacao
 
 
 class TestNotificacao(unittest.TestCase):
