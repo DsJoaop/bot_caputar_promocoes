@@ -65,14 +65,11 @@ def carregar_produtos_desejados_pichau():
 
 def carregar_chats_monitorados():
     config = load_config()
+    chats = []
     if config:
         canais_promo_id_list = config.get("telegram", {}).get("canais_promo_id", [])
-        chats = []
         for canal_info in canais_promo_id_list:
-            canal_name, canal_id = canal_info.popitem()
-            chats.append(ChatTelegram(canal_name, canal_id))
-
+            chats.append(ChatTelegram(canal_info['name'], canal_info['id']))
+    else:
+        logger.error(f"Erro ao carregar arquivo de configuração")
     return chats
-
-
-carregar_chats_monitorados()

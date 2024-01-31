@@ -4,8 +4,10 @@ from flask import Flask, jsonify, request
 from config.setting_load import load_config
 from server.modules.commands import *
 from server.modules.ngrok_config import run_ngrok, get_ngrok_url
+from src.core_monitor_chats.controller_chat import MonitorCanais
 from src.share.buy_pichau.buy_pichau import PichauAutomator
 from src.share.telegram.telegram_notify import Notificacao
+
 
 class TelegramBot:
 
@@ -72,6 +74,14 @@ class TelegramBot:
 
     def run_server(self):
         run_ngrok()
+
+        monitor = MonitorCanais(
+            bot_token=self.bot_token,
+            personal_chat_id=self.ngrok_url,
+            channels_info=load_config()['telegram']["canais_promo_id"]
+        )
+        monitor.start_monitoring_threaded()
+
         self.app.route('/resposta_telegram', methods=['POST'])(self.process_command_telegram)
         self.ngrok_url = get_ngrok_url()
         if self.ngrok_url:
@@ -80,7 +90,6 @@ class TelegramBot:
             print("Não foi possível obter o URL do ngrok.")
 
         self.app.run(port=5000)
-
 
 if __name__ == "__main__":
     bot = TelegramBot()

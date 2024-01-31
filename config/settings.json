@@ -3,10 +3,22 @@
         "bot_token": "6474525795:AAE0REuCbl_4kxPL67IZKNAyZ-Kp1iOlYzg",
         "chat_id": "2145296654",
         "canais_promo_id": [
-            {"LinksBR":"-1260857435"},
-            {"BenchPromo":"-1711010679"},
-            {"Economister":"-1686905299"},
-            {"Economizanderson":"-1237760290"}
+            {
+                "name": "Economister",
+                "id": "-1260857435"
+            },
+            {
+                "name": "LinksBR",
+                "id": "-1711010679"
+            },
+            {
+                "name": "Economizanderson",
+                "id": "-1686905299"
+            },
+            {
+                "name": "BenchPromo",
+                "id": "-1237760290"
+            }
         ]
     },
     "categorias": {
