@@ -1,6 +1,6 @@
 import logging
 
-from src.controller.controller_produtos import ControllerLinks
+from src.controller.controller_links import ControllerLinks
 from src.telegram.notify import Notificacao
 
 if __name__ == "__main__":
