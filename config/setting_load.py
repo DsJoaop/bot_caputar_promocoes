@@ -2,10 +2,6 @@ import json
 import logging
 import os
 
-from src.data_acess.extract_data_pichau import listar_produtos
-from src.model.chat import ChatTelegram
-from src.share.telegram.telegram_mensages import send_mensage
-
 logger = logging.getLogger(__name__)
 
 
@@ -53,23 +49,3 @@ def get_lista_desejos():
         return []
 
 
-def carregar_produtos_desejados_pichau():
-    links = get_lista_desejos()
-    if links is not None:
-        produtos = listar_produtos(links)
-        return produtos
-    else:
-        send_mensage("Erro ao carregar lista de desejo")
-        return []
-
-
-def carregar_chats_monitorados():
-    config = load_config()
-    chats = []
-    if config:
-        canais_promo_id_list = config.get("telegram", {}).get("canais_promo_id", [])
-        for canal_info in canais_promo_id_list:
-            chats.append(ChatTelegram(canal_info['name'], canal_info['id']))
-    else:
-        logger.error(f"Erro ao carregar arquivo de configuração")
-    return chats
