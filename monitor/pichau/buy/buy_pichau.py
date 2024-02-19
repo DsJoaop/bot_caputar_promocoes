@@ -2,8 +2,8 @@ import time
 import webbrowser
 import pyperclip
 
-from src.share.buy_pichau.iteration_image import BuyPichauImage
-from src.share.telegram.telegram_notify import Notificacao
+from monitor.pichau.buy.iteration_image import BuyPichauImage
+from src.telegram.notify import Notificacao
 
 
 def open_link(link):

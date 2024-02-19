@@ -25,7 +25,7 @@ class BuyPichauImage:
             '5_pix.png',
             '6_continuar_revisao.png',
             '7_termos.png',
-            # '8_finalizar_agora.png',
+            '8_finalizar_agora.png',
         ]
         self.assets_directory = assets_directory
         self.timeout_seconds = 2

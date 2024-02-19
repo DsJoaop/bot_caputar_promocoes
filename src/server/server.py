@@ -1,34 +1,25 @@
 import requests
 from flask import Flask, jsonify, request
-
-from config.setting_load import load_config
-from server.modules.commands import *
-from server.modules.ngrok_config import run_ngrok, get_ngrok_url
-from src.share.buy_pichau.buy_pichau import PichauAutomator
-from src.share.telegram.telegram_notify import Notificacao
+from src.controller.base_main import BaseMain
+from src.controller.controller_links import ControllerLinks
+from src.server.modules.commands import *
+from src.server.modules.ngrok import run_ngrok, get_ngrok_url
 
 
-class TelegramBot:
+class TelegramBot(BaseMain):
 
     def __init__(self):
-        config = load_config()['telegram']
+        super().__init__()
         self.user_states = {}
-        self.bot_token = config['bot_token']
-        self.buy_automation = PichauAutomator()
-        self.base_url = f"https://api.telegram.org/bot{self.bot_token}/"
+        self.base_url = f"https://api.telegram.org/bot{self.get_bot_token()}/"
         self.ngrok_url = None
-        self.notify = Notificacao()
-        self.commands = {
-            '/start': command_start,
-            '/stop': command_stop,
-            '/help': command_help,
-            '/list_desejos': command_list_desejos,
-            '/add_desejos': command_add_list_desejos
-        }
+        self.controller_links = ControllerLinks()
+        self.command_handler = CommandHandler(self.user_states, self.get_notify())
+        self.pichau_monitor = ControllerMonitor()
         self.app = Flask(__name__)
 
     def notify_user(self, message):
-        self.notify.enviar_mensagem(message)
+        self._notificador.enviar_mensagem(message)
 
     def configure_webhook(self, url):
         webhook_url = f"{self.base_url}setWebhook?url={url}/resposta_telegram"
@@ -51,12 +42,19 @@ class TelegramBot:
             if chat_id not in self.user_states:
                 self.user_states[chat_id] = {}
 
-            for command, handler in self.commands.items():
-                if command in message_text:
-                    handler(self.user_states, chat_id, self.notify_user, data)
-                    break
+            if '/start' in message_text:
+                self.command_handler.handle_start(chat_id, self.pichau_monitor)
+            elif '/stop' in message_text:
+                self.command_handler.handle_stop(chat_id, self.pichau_monitor)
+            elif '/help' in message_text:
+                self.command_handler.handle_help(chat_id)
+            elif '/list_desejos' in message_text:
+                self.command_handler.handle_list_desejos(chat_id)
+            elif '/add_desejos' in message_text:
+                self.command_handler.handle_add_list_desejos(chat_id)
             else:
-                command_process(self.user_states, chat_id, self.notify_user, data)
+                self.command_handler.command_process(self.user_states, chat_id, self.get_notify())
+
         else:
             resposta = data['callback_query']['data']
             entities = data['callback_query']['message']['entities']
@@ -65,7 +63,7 @@ class TelegramBot:
             if len(entities) > 3 and entities[1]['type'] == 'text_link':
                 link = entities[1]['url']
             if link is not None and resposta == "sim":
-                mensagem = self.buy_automation.run_automation_pix(link)
+                mensagem = self.get_buy_pichau().run_automation_pix(link)
                 self.notify_user(mensagem)
             else:
                 self.notify_user("Ok, compra não autorizada!")
@@ -73,10 +71,6 @@ class TelegramBot:
 
     def run_server(self):
         run_ngrok()
-
-        monitor = ControllerMonitor()
-        monitor.iniciar_monitoramento()
-
         self.app.route('/resposta_telegram', methods=['POST'])(self.process_command_telegram)
         self.ngrok_url = get_ngrok_url()
         if self.ngrok_url:
@@ -85,6 +79,7 @@ class TelegramBot:
             print("Não foi possível obter o URL do ngrok.")
 
         self.app.run(port=5000)
+
 
 if __name__ == "__main__":
     bot = TelegramBot()
