@@ -15,7 +15,8 @@ class TelegramBot(BaseMain):
         self.ngrok_url = None
         self.controller_links = ControllerLinks()
         self.command_handler = CommandHandler(self.user_states, self.get_notify())
-        self.pichau_monitor = ControllerMonitor()
+        self.pichau_monitor = ControllerMonitorPichau()
+        self.pelando_monitor = ControllerMonitorPelando()
         self.app = Flask(__name__)
 
     def notify_user(self, message):

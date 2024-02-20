@@ -1,5 +1,5 @@
 class Produto:
-    def __init__(self, link, price, category=None, shop=None, nome=None, link_img=None, max_price=None):
+    def __init__(self, link, price, category=None, shop=None, nome=None, link_img=None, max_price=None, cupom=None):
         self._link = link
         self._price = price
         self._shop = shop
@@ -7,6 +7,7 @@ class Produto:
         self._nome = nome
         self._max_price = max_price
         self._category = category
+        self._cupom = cupom
 
     @property
     def link(self):
@@ -36,6 +37,10 @@ class Produto:
     def category(self):
         return self._category
 
+    @property
+    def cupom(self):
+        return self._cupom
+
     @link.setter
     def link(self, value):
         self._link = value
@@ -63,3 +68,7 @@ class Produto:
     @category.setter
     def category(self, value):
         self._category = value
+
+    @cupom.setter
+    def cupom(self, value):
+        self._cupom = value

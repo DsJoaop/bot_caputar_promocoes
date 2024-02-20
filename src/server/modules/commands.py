@@ -1,5 +1,5 @@
 from config.setting_load import get_lista_desejos, add_produto_desejo
-from monitor.pichau.core.monitor_pichau import ControllerMonitor
+from monitor.pichau.core.monitor_pichau import ControllerMonitorPichau
 from src.telegram.notify import Notificacao
 
 
@@ -8,7 +8,7 @@ class CommandHandler:
         self.user_states = user_states
         self.notify_user = notify_user
 
-    def handle_start(self, chat_id, controller: ControllerMonitor):
+    def handle_start(self, chat_id, controller: ControllerMonitorPichau):
         user_state = self.user_states.get(chat_id, {}).get('state')
         if user_state == 'liberado' or user_state is None:
             welcome_message = (

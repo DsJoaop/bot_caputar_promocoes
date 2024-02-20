@@ -32,7 +32,7 @@ class AnalyzePichau:
     def _verificar_desconto_produto_desejado(self, produto, novo_preco, preco_anterior, discount, indice):
         try:
             if discount > 0:
-                self.notificador.enviar_notificacao(
+                self.notificador.enviar_notificacao_desconto(
                     produto, preco_anterior, discount, novo_preco
                 )
                 for produto_desejado in self.produtos_desejados:

@@ -1,28 +1,28 @@
 from concurrent.futures import ProcessPoolExecutor
 
-from monitor.pichau.core.analyze_pichau import AnalyzePichau
+from monitor.pelando.core.analyze_pelando import AnalyzePelando
 from src.controller.base_main import BaseMain
 from src.telegram.notify import Notificacao
 
 
-class ControllerMonitorPichau(BaseMain):
+class ControllerMonitorPelando(BaseMain):
     def __init__(self):
         super().__init__()
         if self._config and 'telegram' in self._config:
             self.notificador = Notificacao()
             self.desconto_minimo = 0
             self.lista_desejo = []
-            self.running = False  # Adiciona um sinalizador para controlar o estado de execução
+            self.running = False
         else:
             raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
 
     def dividir_categorias(self):
-        if self._config and 'categorias' in self._config:
+        if self._config and 'promocoes' in self._config:
             self.running = True
             self.lista_desejo = []
 
             with ProcessPoolExecutor() as executor:
-                for categoria, url in self._config['categorias'].items():
+                for categoria, url in self._config['promocoes'].items():
                     executor.submit(self.monitorar_categoria, categoria, url)
         else:
             print(
@@ -42,12 +42,12 @@ class ControllerMonitorPichau(BaseMain):
 
     def monitorar_categoria(self, categoria, url):
         while self.running:
-            category_monitor = AnalyzePichau(categoria, url, self.get_controller_links(), [], self.get_notify())
+            category_monitor = AnalyzePelando(categoria, url, self.get_controller_links(), [], self.get_notify())
             category_monitor.run()
 
 
 def main():
-    monitoramento = ControllerMonitorPichau()
+    monitoramento = ControllerMonitorPelando()
     monitoramento.iniciar_monitoramento()
 
 
