@@ -11,4 +11,4 @@ if __name__ == "__main__":
                                    "-pch-ps100-24prgbwht")
     preco = links.get_price("https://www.pichau.com.br/cabo-extensor-premium-24p-pichau-ps100-rgb-240mm-branco"
                             "-pch-ps100-24prgbwht")
-    notificador.enviar_notificacao(produto, 50, 30)
+    notificador.enviar_notificacao_desconto(produto, 50, 30)

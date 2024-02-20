@@ -58,10 +58,10 @@ class PichauScraping:
             if product_price_with_currency:
                 product_price = product_price_with_currency.get('content').replace('R$', '').replace(',', '').strip()
             else:
-                product_price = None
+                return None
 
             # Criar objeto Produto
-            product = Produto(link, float(product_price) if product_price else None)
+            product = Produto(link, float(product_price))
             product.category = nome_tag.split()[0] + ' ' + nome_tag.split()[1] + ' ' + nome_tag.split()[2]
             product.link_img = self.extract_img(product)
             product.nome = nome_tag

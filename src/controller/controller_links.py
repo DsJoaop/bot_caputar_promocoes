@@ -17,7 +17,7 @@ class ControllerLinks:
         if 'pichau.com.br' in link:
             return self._pichau.scraping_category(link, max_price)
         elif 'pelando.com' in link:
-            return self._pelando.get_category(link, max_price)
+            return self._pelando.scraping_category(link, max_price)
 
     def get_list_desejos(self) -> List[Produto]:
         desejos = get_lista_desejos()
@@ -36,7 +36,7 @@ class ControllerLinks:
                 if produto:
                     produtos.append(produto)
                 else:
-                    produtos.extend(self._pelando.get_category(link, max_price))
+                    produtos.extend(self._pelando.scraping_category(link, max_price))
         return produtos
 
     def create_product(self, link: str) -> Produto:
