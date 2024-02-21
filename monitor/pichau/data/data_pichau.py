@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import requests
 from bs4 import BeautifulSoup
-from src.model.produto import Produto
+from src.model.pichau import ProdutoPichau
 
 
 class PichauScraping:
@@ -12,7 +12,7 @@ class PichauScraping:
                           'Chrome/58.0.3029.110 Safari/537.3'
         }
 
-    def scraping_category(self, url, max_price=None) -> List[Produto]:
+    def scraping_category(self, url, max_price=None) -> List[ProdutoPichau]:
         try:
             response = requests.get(url, headers=self.headers, timeout=20)
             response.raise_for_status()
@@ -35,7 +35,7 @@ class PichauScraping:
             print("Falha ao obter a página:", e)
             return []
 
-    def extract_img(self, produto: Produto) -> str:
+    def extract_img(self, produto: ProdutoPichau) -> str:
         try:
             response = requests.get(produto.link, headers=self.headers, timeout=20)
             response.raise_for_status()
@@ -46,7 +46,7 @@ class PichauScraping:
             print("Falha ao obter a página ou en"
                   "contrar elementos:", e)
 
-    def create_product(self, link, max_price=None) -> Optional[Produto]:
+    def create_product(self, link, max_price=None) -> Optional[ProdutoPichau]:
         try:
             response = requests.get(link, headers=self.headers, timeout=20)
             response.raise_for_status()
@@ -61,7 +61,7 @@ class PichauScraping:
                 return None
 
             # Criar objeto Produto
-            product = Produto(link, float(product_price))
+            product = ProdutoPichau(link, float(product_price))
             product.category = nome_tag.split()[0] + ' ' + nome_tag.split()[1] + ' ' + nome_tag.split()[2]
             product.link_img = self.extract_img(product)
             product.nome = nome_tag

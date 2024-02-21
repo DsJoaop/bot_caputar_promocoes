@@ -1,9 +1,13 @@
+import logging
 from typing import List
 
 import requests
 from bs4 import BeautifulSoup
 
-from src.model.produto import Produto
+from src.model.oferta import Oferta
+from src.model.cupom import Cupom
+from src.model.desconto import Desconto
+from src.model.gratis import Gratis
 
 
 class PelandoScraping:
@@ -13,63 +17,97 @@ class PelandoScraping:
                           'Chrome/58.0.3029.110 Safari/537.3'
         }
 
-    def create_product(self, link, max_price=None):
+    def _extract_info(self, soup, link, oferta_type, codigo=None) -> Oferta:
+        titulo = soup.find('title').text.strip().rstrip(" | Pelando")
+        image = soup.find('meta', {'property': 'og:image'})['content']
+        loja = soup.find('a', class_='sc-jGnTwx').text.strip()
+        id_oferta = titulo
 
+        if oferta_type == 'gratis':
+            return Oferta(identificador=id_oferta, gratis=Gratis(link, loja, titulo, image))
+        elif oferta_type == 'cupom':
+            desconto = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
+            return Oferta(identificador=id_oferta, cupom=Cupom(link, image, loja, titulo, codigo, desconto))
+        else:
+            preco = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
+            try:
+                cupom = soup.find('div', 'sc-bCvmQg').text.strip()
+            except AttributeError:
+                cupom = None
+            categoria = ' '.join(titulo.split()[:3])
+            return Oferta(identificador=id_oferta, desconto=Desconto(link, preco, categoria, loja, titulo, image, cupom))
+
+    def _extract_data(self, link) -> BeautifulSoup:
         response = requests.get(link, headers=self.headers, timeout=10)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
+        return BeautifulSoup(response.content, 'html.parser')
 
-        nome = soup.find('title').text.strip().split(":")[1].split("|")[0]
-
-        image = soup.find('meta', {'property': 'og:image'})['content']
-        preco = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
-        loja = soup.find('a', class_='sc-jGnTwx').text.strip()
-
+    def create_product(self, link, max_price=None):
         try:
-            cupom = soup.find('div', 'sc-bCvmQg').text.strip()
-        except:
-            cupom = None
+            soup = self._extract_data(link)
+            cupom = soup.find('span', string='Pegar cupom')
+            element = soup.find('a', href=lambda href: href and href.startswith("https://www.pelando.com.br"))
+            span_element = soup.find('span', {'data-masked': True})
+            g = soup.find('span', {'data-testid': 'deal-stamp'})
 
-        categoria = nome.split()[0] + ' ' + nome.split()[1] + ' ' + nome.split()[2]
-        return Produto(link, preco, categoria, loja, nome, image, max_price, cupom)
+            if cupom:
+                return self._extract_info(soup, link, 'cupom')
+            elif element and span_element:
+                return self._extract_info(soup, link, 'cupom', codigo=span_element['data-masked'])
+            elif g:
+                return self._extract_info(soup, link, 'gratis')
+            else:
+                return self._extract_info(soup, link, 'product')
+        except requests.RequestException as e:
+            logging.error(f"Erro ao fazer scraping do produto: {str(e)}")
+            return None
 
-    def scraping_category(self, url, max_price=None):
+    def scraping_category(self, url, max_price=None) -> List[Oferta]:
         try:
-            response = requests.get(url, headers=self.headers, timeout=10)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.content, 'html.parser')
+            soup = self._extract_data(url)
             cards = soup.find_all("li", "sc-cb8be5d8-2 hliMah")
             del cards[8]
-            product = []
+            products = []
+
             for card in cards:
                 link = "https://pelando.com.br" + card.find_all('a')[1]['href']
-                produto = self.create_product(link, max_price)
-                if produto is None:
-                    # Se o produto não puder ser extraído, saia do loop
+                product = self.create_product(link, max_price)
+                if product is None:
                     break
-                product.append(produto)
-            return product
+                products.append(product)
+
+            return products
         except requests.RequestException as e:
-            print("Falha ao obter a página:", e)
-            return []
+            logging.error(f"Erro ao fazer o primeiro scraping: {str(e)}")
 
     def extract_img(self, link):
-        response = requests.get(link, headers=self.headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        image = soup.find('meta', {'property': 'og:image'})['content']
-        return image
+        try:
+            soup = self._extract_data(link)
+            return soup.find('meta', {'property': 'og:image'})['content']
+        except Exception as e:
+            logging.error(f"Erro ao extrair imagem: {str(e)}")
+            return None
 
     def extract_price(self, link):
-        response = requests.get(link, headers=self.headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        return soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
+        try:
+            soup = self._extract_data(link)
+            return soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
+        except Exception as e:
+            logging.error(f"Erro ao extrair preço: {str(e)}")
+            return None
 
 
-# Exemplo de uso:
 if __name__ == "__main__":
-    pichau_scraping = PelandoScraping()
-    produtos: List[Produto] = pichau_scraping.scraping_category("https://www.pelando.com.br/eletronicos")
-    for produto in produtos:
-        print(produto.nome)
+    pelando_scraping = PelandoScraping()
+    gratis = pelando_scraping.create_product(
+        "https://www.pelando.com.br/d/d4b22942-508f-482c-9b3b-c3bcda464b94/e-book-o-livro-mais-doce-do-mundo-or-receitas-nestle")
+    cupom_na_loja = pelando_scraping.create_product(
+        "https://www.pelando.com.br/d/6de0f58b-2d57-4c7c-8b43-70f93fab98ca/rdollar40-off-nas-compras-acima-de-rdollar199-em-automoveis-e-motocicletas-com-cupom-shopee?expired_deal=true")
+    cupom_desconto = pelando_scraping.create_product(
+        "https://www.pelando.com.br/d/920eb2d6-3fad-4295-8ce1-2233b91d8bd7/rdollar50-off-em-compras-acima-de-rdollar250-com-cupom-mercado-carrefour")
+    produto4 = pelando_scraping.create_product(
+        "https://www.pelando.com.br/d/d4e1259a-1f0f-42d5-a1fd-236406c47d6c/estante-livreiro-5-prateleiras-monza-viero")
+    print(str(gratis))
+    print(str(cupom_na_loja))
+    print(str(cupom_desconto))
+    print(str(produto4))

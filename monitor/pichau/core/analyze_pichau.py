@@ -4,14 +4,14 @@ import logging
 import threading
 from typing import List
 
-from src.controller.controller_links import ControllerLinks
-from src.model.produto import Produto
+from src.controller.controller_scraps import ControllerScraps
 from monitor.pichau.buy.buy_pichau import PichauAutomator
+from src.model.pichau import ProdutoPichau
 from src.telegram.notify import Notificacao
 
 
 class AnalyzePichau:
-    def __init__(self, categoria: str, url: str, controlador_link: ControllerLinks, produtos_desejados: List[Produto],
+    def __init__(self, categoria: str, url: str, controlador_link: ControllerScraps, produtos_desejados: List[ProdutoPichau],
                  notificador):
         self.controlador_link = controlador_link
         self.categoria = categoria
@@ -19,7 +19,7 @@ class AnalyzePichau:
         self.notificador: Notificacao = notificador
         self.produtos_desejados = produtos_desejados
         self.automator = PichauAutomator()
-        self.produtos = self._scraping_inicial()
+        self.produtos: List[ProdutoPichau] = self._scraping_inicial()
 
     def _scraping_inicial(self):
         try:

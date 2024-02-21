@@ -4,9 +4,17 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="2">
+          <list size="10">
             <item index="0" class="java.lang.String" itemvalue="typing_extensions" />
-            <item index="1" class="java.lang.String" itemvalue="pydantic_core" />
+            <item index="1" class="java.lang.String" itemvalue="beautifulsoup4" />
+            <item index="2" class="java.lang.String" itemvalue="PyAutoGUI" />
+            <item index="3" class="java.lang.String" itemvalue="pyperclip" />
+            <item index="4" class="java.lang.String" itemvalue="opencv-python" />
+            <item index="5" class="java.lang.String" itemvalue="requests" />
+            <item index="6" class="java.lang.String" itemvalue="numpy" />
+            <item index="7" class="java.lang.String" itemvalue="Flask" />
+            <item index="8" class="java.lang.String" itemvalue="Pillow" />
+            <item index="9" class="java.lang.String" itemvalue="psutil" />
           </list>
         </value>
       </option>

@@ -2,13 +2,14 @@ import time
 import logging
 from typing import List
 
-from src.controller.controller_links import ControllerLinks
-from src.model.produto import Produto
+from src.model.oferta import Oferta
+from src.controller.controller_scraps import ControllerScraps
+from src.model.desconto import Desconto
 from src.telegram.notify import Notificacao
 
 
 class AnalyzePelando:
-    def __init__(self, categoria: str, url: str, controlador_link: ControllerLinks, produtos_desejados: List[Produto],
+    def __init__(self, categoria: str, url: str, controlador_link: ControllerScraps, produtos_desejados: List[Desconto],
                  notificador):
         self.controlador_link = controlador_link
         self.categoria = categoria
@@ -22,26 +23,25 @@ class AnalyzePelando:
             novos_produtos = self.controlador_link.get_category(self.url)
             return novos_produtos
         except Exception as e:
-            logging.error(f"Erro ao fazer scraping inicial: {str(e)}")
+            logging.error(f"Erro ao fazer o primeiro scraping: {str(e)}")
             return {}
 
-    def enviar_notificacao(self, produto):
+    def enviar_notificacao(self, produto: Oferta):
         self.notificador.enviar_alerta_nova_promocao(produto)
 
     def run(self):
         while True:
             start_time = time.time()
             try:
-                novos_produtos = self.controlador_link.get_category(self.url)
+                novas_ofertas: List[Oferta] = self.controlador_link.get_category(self.url)
 
-                for novo_produto in novos_produtos:
-                    produto_existente = next((p for p in self.produtos if p.nome == novo_produto.nome), None)
+                for oferta in novas_ofertas:
+                    produto_existente = next((p for p in self.produtos if p.id == oferta.id), None)
                     if not produto_existente:
-                        self.produtos.append(novo_produto)
-                        self.enviar_notificacao(novo_produto)
+                        self.produtos.append(oferta)
+                        self.enviar_notificacao(oferta)
 
-
-                self.produtos = novos_produtos
+                self.produtos = novas_ofertas
 
             except Exception as e:
                 logging.error(f"Erro ao fazer scraping inicial: {str(e)}")
@@ -49,3 +49,4 @@ class AnalyzePelando:
             end_time = time.time()
             execution_time = end_time - start_time
             print(f"Analisando {self.categoria}... Tempo de execução: {execution_time:.4f} segundos")
+

@@ -2,6 +2,7 @@ import requests
 import logging
 
 from config.setting_load import load_config
+from src.model.oferta import Oferta
 
 logger = logging.getLogger(__name__)
 
@@ -65,12 +66,7 @@ class Notificacao:
         }
         self.enviar_mensagem(mensagem, reply_markup)
 
-    def enviar_alerta_nova_promocao(self, product):
-        mensagem = (
-            f'<a href="{product.link_img}">&#8205;</a>'  # Link vazio para a imagem
-            f"<b>🎉 Novo {product.category}</b>\n\n"
-            f"<a href=\"{product.link}\">🔗 {product.nome}</a>\n\n"
-            f"💰 <b>Preço:</b> R${product.price:.2f}\n\n"
-            f"🛒 <b>Deseja comprar?!</b>\n"
-        )
-        self.enviar_mensagem(mensagem)
+    def enviar_alerta_nova_promocao(self, product: Oferta):
+        self.enviar_mensagem(str(product))
+
+

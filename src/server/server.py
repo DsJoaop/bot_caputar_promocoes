@@ -1,7 +1,7 @@
 import requests
 from flask import Flask, jsonify, request
 from src.controller.base_main import BaseMain
-from src.controller.controller_links import ControllerLinks
+from src.controller.controller_scraps import ControllerScraps
 from src.server.modules.commands import *
 from src.server.modules.ngrok import run_ngrok, get_ngrok_url
 
@@ -13,7 +13,7 @@ class TelegramBot(BaseMain):
         self.user_states = {}
         self.base_url = f"https://api.telegram.org/bot{self.get_bot_token()}/"
         self.ngrok_url = None
-        self.controller_links = ControllerLinks()
+        self.controller_links = ControllerScraps()
         self.command_handler = CommandHandler(self.user_states, self.get_notify())
         self.pichau_monitor = ControllerMonitorPichau()
         self.pelando_monitor = ControllerMonitorPelando()
