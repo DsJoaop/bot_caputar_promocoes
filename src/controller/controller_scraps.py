@@ -2,6 +2,7 @@ from config.setting_load import get_lista_desejos
 from monitor.pelando.data.data_pelando import PelandoScraping
 from monitor.pichau.data.data_pichau import PichauScraping
 from monitor.pichau.buy.buy_pichau import PichauAutomator
+from src.model.oferta import Oferta
 
 
 class ControllerScraps:
@@ -10,11 +11,11 @@ class ControllerScraps:
         self._pelando = PelandoScraping()
         self._buy_pichau = PichauAutomator()
 
-    def get_category(self, link: str, max_price=None):
+    def get_category(self, link: str, categoria=None, max_price=None):
         if 'pichau.com.br' in link:
             return self._pichau.scraping_category(link, max_price)
         elif 'pelando.com' in link:
-            return self._pelando.scraping_category(link, max_price)
+            return self._pelando.scraping_category(link, categoria)
 
     def get_list_desejos(self):
         desejos = get_lista_desejos()
@@ -50,3 +51,6 @@ class ControllerScraps:
 
     def get_price_pichau(self, link) -> float:
         return self._pichau.extract_price(link)
+
+    def get_last_product(self, link, categoria) -> Oferta:
+        return self._pelando.scraping_last_item(link, categoria)

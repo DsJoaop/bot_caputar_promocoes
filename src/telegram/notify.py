@@ -28,7 +28,7 @@ class Notificacao:
             if response.status_code == 200:
                 logger.info("Mensagem enviada com sucesso!")
             else:
-                logger.error("Falha ao enviar mensagem")
+                logger.error("Falha ao enviar mensagem", response.status_code)
         except requests.RequestException as e:
             logger.exception(f"Erro ao enviar mensagem: {e}")
 
@@ -67,6 +67,11 @@ class Notificacao:
         self.enviar_mensagem(mensagem, reply_markup)
 
     def enviar_alerta_nova_promocao(self, product: Oferta):
-        self.enviar_mensagem(str(product))
+        mensagem = str(product)
+        self.enviar_mensagem(mensagem)
 
 
+
+if __name__ == '__main__':
+    noty = Notificacao()
+    noty.enviar_mensagem('Vou botar pra funcionar')

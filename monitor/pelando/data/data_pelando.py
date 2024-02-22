@@ -17,7 +17,7 @@ class PelandoScraping:
                           'Chrome/58.0.3029.110 Safari/537.3'
         }
 
-    def _extract_info(self, soup, link, oferta_type, codigo=None) -> Oferta:
+    def _extract_info(self, soup, link, oferta_type, codigo=None, categoria=None) -> Oferta:
         titulo = soup.find('title').text.strip().rstrip(" | Pelando")
         image = soup.find('meta', {'property': 'og:image'})['content']
         loja = soup.find('a', class_='sc-jGnTwx').text.strip()
@@ -29,40 +29,39 @@ class PelandoScraping:
             desconto = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
             return Oferta(identificador=id_oferta, cupom=Cupom(link, image, loja, titulo, codigo, desconto))
         else:
-            preco = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip()
+            preco = soup.find('span', {'data-testid': 'deal-stamp'}).find('span').text.strip().replace(',', '.').strip()
             try:
                 cupom = soup.find('div', 'sc-bCvmQg').text.strip()
             except AttributeError:
                 cupom = None
-            categoria = ' '.join(titulo.split()[:3])
-            return Oferta(identificador=id_oferta, desconto=Desconto(link, preco, categoria, loja, titulo, image, cupom))
+            return Oferta(identificador=id_oferta, desconto=Desconto(link, float(preco), categoria, loja, titulo, image, cupom))
 
     def _extract_data(self, link) -> BeautifulSoup:
         response = requests.get(link, headers=self.headers, timeout=10)
         response.raise_for_status()
         return BeautifulSoup(response.content, 'html.parser')
 
-    def create_product(self, link, max_price=None):
+    def create_product(self, link, categoria=None):
         try:
             soup = self._extract_data(link)
             cupom = soup.find('span', string='Pegar cupom')
             element = soup.find('a', href=lambda href: href and href.startswith("https://www.pelando.com.br"))
             span_element = soup.find('span', {'data-masked': True})
-            g = soup.find('span', {'data-testid': 'deal-stamp'})
+            g = soup.find('span', {'data-testid': 'deal-stamp'}).find_all('span')[-1]
 
             if cupom:
-                return self._extract_info(soup, link, 'cupom')
+                return self._extract_info(soup, link, 'cupom', categoria=categoria)
             elif element and span_element:
-                return self._extract_info(soup, link, 'cupom', codigo=span_element['data-masked'])
-            elif g:
-                return self._extract_info(soup, link, 'gratis')
+                return self._extract_info(soup, link, 'cupom', codigo=span_element['data-masked'], categoria=categoria)
+            elif 'Grátis' in g:
+                return self._extract_info(soup, link, 'gratis', categoria=categoria)
             else:
-                return self._extract_info(soup, link, 'product')
+                return self._extract_info(soup, link, 'product', categoria=categoria)
         except requests.RequestException as e:
-            logging.error(f"Erro ao fazer scraping do produto: {str(e)}")
+            logging.error(f"Erro ao fazer scraping do produto: {str(e)}", categoria)
             return None
 
-    def scraping_category(self, url, max_price=None) -> List[Oferta]:
+    def scraping_category(self, url, categoria=None) -> List[Oferta]:
         try:
             soup = self._extract_data(url)
             cards = soup.find_all("li", "sc-cb8be5d8-2 hliMah")
@@ -71,12 +70,27 @@ class PelandoScraping:
 
             for card in cards:
                 link = "https://pelando.com.br" + card.find_all('a')[1]['href']
-                product = self.create_product(link, max_price)
+                product = self.create_product(link, categoria)
                 if product is None:
                     break
                 products.append(product)
 
             return products
+        except requests.RequestException as e:
+            logging.error(f"Erro ao fazer o primeiro scraping: {str(e)}")
+
+    def scraping_last_item(self, url, max_price=None) -> Oferta:
+        try:
+            soup = self._extract_data(url)
+            cards = soup.find_all("li", "sc-cb8be5d8-2 hliMah")
+
+            link = "https://pelando.com.br" + cards[0].find_all('a')[1]['href']
+            product = self.create_product(link, max_price)
+            if product is not None:
+                return product
+            else:
+                link = "https://pelando.com.br" + cards[1].find_all('a')[1]['href']
+                return self.create_product(link, max_price)
         except requests.RequestException as e:
             logging.error(f"Erro ao fazer o primeiro scraping: {str(e)}")
 

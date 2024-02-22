@@ -1,5 +1,5 @@
 class Desconto:
-    def __init__(self, link, price, category: str = None, shop: str = None, nome: str = None, link_img: str = None,
+    def __init__(self, link, price: float, category: str = None, shop: str = None, nome: str = None, link_img: str = None,
                  cupom: str = None):
         self._link = link
         self._price = price
@@ -74,8 +74,9 @@ class Desconto:
     def __str__(self):
         mensagem = (
             f'<a href="{self._link_img}">&#8205;</a>'  # Link vazio para a imagem
-            f"<b>🎉 Novo {self._category}</b>\n\n"
-            f"<a href=\"{self._link}\">🔗 {self._nome}</a>\n\n"
-            f"💰 <b>Preço:</b> R${self._price:.2f}\n\n"
+            f"<p> {self._nome}</p>\n\n"
+            f"<p>🎉 Categoria: {self._category}</p>\n"
+            f"<b>💰 Preço:</b> R${self._price:.2f}\n\n"
+            "<p><a href=\"{self._link}\"> Link </p>"
         )
         return mensagem

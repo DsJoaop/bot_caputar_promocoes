@@ -1,5 +1,7 @@
 import requests
 from flask import Flask, jsonify, request
+
+from monitor.pelando.core.monitor_pelando import ControllerMonitorPelando
 from src.controller.base_main import BaseMain
 from src.controller.controller_scraps import ControllerScraps
 from src.server.modules.commands import *
