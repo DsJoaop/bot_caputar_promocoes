@@ -67,7 +67,7 @@ class BuyPichauImage:
 
     def wait(self, image_path):
         if os.path.basename(image_path) in [self.img_paths[3], self.img_paths[4]]:
-            time.sleep(1.5)
+            time.sleep(1.4)
 
     def search_on_screen(self, image_path, index):
         if not path_exists(image_path):

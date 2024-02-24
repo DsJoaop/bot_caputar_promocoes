@@ -7,8 +7,9 @@ from src.telegram.notify import Notificacao
 
 
 def open_link(link):
-    webbrowser.open(link)
-    time.sleep(2)
+    webbrowser.register('edge', None, webbrowser.BackgroundBrowser(
+        "C://Program Files (x86)//Microsoft//Edge//Application//msedge.exe"))
+    webbrowser.get('edge').open(link)
 
 
 class PichauAutomator:
