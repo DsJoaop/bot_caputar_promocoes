@@ -29,8 +29,6 @@ class YouTubeLiveChatScraper:
         return author, text
 
     def _is_link(self, keyword, text):
-        text = text
-        keys = {'rtx', 'gtx', 'ryzen', 'rx', 'water', '550'}
         words = text.split()
         for word in words:
             if keyword in word:

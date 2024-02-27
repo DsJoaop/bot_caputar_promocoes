@@ -1,5 +1,9 @@
+import os
+
 import requests
 import logging
+
+from dotenv import load_dotenv
 
 from config.setting_load import load_config
 from src.model.oferta import Oferta
@@ -9,9 +13,14 @@ logger = logging.getLogger(__name__)
 
 class Notificacao:
     def __init__(self):
-        self._config = load_config()['telegram']
-        self._base_url = f"https://api.telegram.org/bot{self._config['bot_token']}/"
-        self._chat_id = self._config['chat_id']
+
+        load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
+        self._bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        self._base_url = f"https://api.telegram.org/bot{self._bot_token}/"
+
+        self._chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+
 
     def enviar_mensagem(self, mensagem, reply_markup=None):
         dados = {
@@ -71,7 +80,6 @@ class Notificacao:
         self.enviar_mensagem(mensagem)
 
 
-
 if __name__ == '__main__':
     noty = Notificacao()
-    noty.enviar_mensagem('Vou botar pra funcionar')
+    noty.enviar_mensagem('Em manutenção')

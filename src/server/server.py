@@ -27,7 +27,7 @@ class TelegramBot(BaseMain):
     def configure_webhook(self, url):
         webhook_url = f"{self.base_url}setWebhook?url={url}/resposta_telegram"
         try:
-            response = requests.get(webhook_url, verify=True)  # Verificar SSL
+            response = requests.get(webhook_url, verify=True)
             if response.status_code == 200:
                 print("Webhook configurado com sucesso!")
             else:
@@ -39,12 +39,14 @@ class TelegramBot(BaseMain):
         data = request.json
 
         if data and 'message' in data and 'text' in data['message']:
+            # Process regular messages
             message_text = data['message']['text']
             chat_id = data['message']['chat']['id']
 
             if chat_id not in self.user_states:
                 self.user_states[chat_id] = {}
 
+            # Handle different commands based on message text
             if '/start' in message_text:
                 self.command_handler.handle_start(chat_id, self.pichau_monitor)
             elif '/stop' in message_text:
@@ -58,7 +60,8 @@ class TelegramBot(BaseMain):
             else:
                 self.command_handler.command_process(self.user_states, chat_id, self.get_notify())
 
-        else:
+        elif data and 'callback_query' in data and 'data' in data['callback_query']:
+            # Process callback queries
             resposta = data['callback_query']['data']
             entities = data['callback_query']['message']['entities']
 
@@ -69,7 +72,8 @@ class TelegramBot(BaseMain):
                 mensagem = self.get_buy_pichau().run_automation_pix(link)
                 self.notify_user(mensagem)
             else:
-                self.notify_user("Ok, compra não autorizada!")
+                self.notify_user("Ok, compra não autorizada.")
+
         return jsonify({'success': True})
 
     def run_server(self):

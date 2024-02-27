@@ -1,4 +1,7 @@
+import os
 from typing import List
+
+from dotenv import load_dotenv
 
 from config.setting_load import load_config
 from src.controller.controller_scraps import ControllerScraps
@@ -9,19 +12,18 @@ from src.telegram.notify import Notificacao
 
 class BaseMain:
     def __init__(self):
+        load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
+
+        self._bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        self._chat_id = os.getenv("TELEGRAM_CHAT_ID")
         self._config = load_config()
-        self._config_telegram = self._config['telegram']
-        self._config_desejos = self._config['desejos']
-        self._bot_token = self._config_telegram['bot_token']
         self._buy_automation = PichauAutomator()
         self._product_link = ControllerScraps()
         self._notificador = Notificacao()
+        self._config_desejos = self._config['desejos']
 
     def get_config(self) -> dict:
         return self._config
-
-    def get_config_telegram(self):
-        return self._config_telegram
 
     def get_config_desejos(self):
         return self._config_desejos

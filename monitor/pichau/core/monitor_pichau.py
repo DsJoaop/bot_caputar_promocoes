@@ -1,5 +1,5 @@
 from concurrent.futures import ProcessPoolExecutor
-
+import multiprocessing
 from monitor.pichau.core.analyze_pichau import AnalyzePichau
 from src.controller.base_main import BaseMain
 from src.telegram.notify import Notificacao
@@ -8,11 +8,11 @@ from src.telegram.notify import Notificacao
 class ControllerMonitorPichau(BaseMain):
     def __init__(self):
         super().__init__()
-        if self._config and 'telegram' in self._config:
+        if self._config:
             self.notificador = Notificacao()
             self.desconto_minimo = 0
             self.lista_desejo = []
-            self.running = False  # Adiciona um sinalizador para controlar o estado de execução
+            self.running = False
         else:
             raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
 
@@ -31,7 +31,8 @@ class ControllerMonitorPichau(BaseMain):
 
     def iniciar_monitoramento(self):
         if not self.running:
-            self.dividir_categorias()
+            process = multiprocessing.Process(target=self.dividir_categorias)
+            process.start()
 
     def parar_monitoramento(self):
         self.running = False

@@ -16,7 +16,6 @@ class CommandHandler:
                 "Digite /help para ver os comandos disponíveis."
             )
             self.notify_user.enviar_mensagem(welcome_message)
-            controller.iniciar_monitoramento()
         else:
             self.notify_user.enviar_mensagem("Termine o processo anterior para ver o comando!")
 
@@ -83,13 +82,13 @@ class CommandHandler:
                         add_produto_desejo(link_produto, preco_maximo)
                         produtos_adicionados.append((link_produto, preco_maximo))
                     except ValueError:
-                        notify_user(
+                        notify_user.enviar_mensagem(
                             "Por favor, envie o preço seguido pelo link do produto separados por ';' em cada linha.")
                         user_states[chat_id]['state'] = None  # Reinicia o estado após adicionar o produto
                         return
                     except Exception as e:
                         print(e)
-                        notify_user(
+                        notify_user.enviar_mensagem(
                             "Houve um erro ao salvar os produtos desejados. Por favor, tente novamente mais tarde.")
                         user_states[chat_id]['state'] = None  # Reinicia o estado após adicionar o produto
                         return
@@ -98,12 +97,12 @@ class CommandHandler:
 
             if produtos_adicionados:
                 for link, preco in produtos_adicionados:
-                    notify_user(
+                    notify_user.enviar_mensagem(
                         f"O produto no link: {link} \n\nFoi adicionado à lista de desejos com um preço máximo de {preco}.")
             else:
                 notify_user("Por favor, envie o preço seguido pelo link do produto separados por ';' em cada linha.")
         except Exception as e:
-            notify_user("Houve um erro ao processar as entradas. Por favor, tente novamente mais tarde.")
+            notify_user.enviar_mensagem("Houve um erro ao processar as entradas. Por favor, tente novamente mais tarde.")
             print(e)  # Apenas para depuração, pode ser removido em ambiente de produção
 
     def other_command(self, user_states, chat_id, notify_user, message):
@@ -117,7 +116,8 @@ class CommandHandler:
                 handler = estado_espera[user_state]
                 handler(user_states, chat_id, notify_user, message)
             else:
-                notify_user("Estado de espera indefinido")
+                notify_user.enviar_mensagem("Estado de espera indefinido")
+
 
 
 estado_espera = {

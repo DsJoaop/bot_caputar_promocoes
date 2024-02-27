@@ -8,7 +8,7 @@ from src.telegram.notify import Notificacao
 class ControllerMonitorPelando(BaseMain):
     def __init__(self):
         super().__init__()
-        if self._config and 'telegram' in self._config:
+        if self._config:
             self.notificador = Notificacao()
             self.desconto_minimo = 0
             self.lista_desejo = []
