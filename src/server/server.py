@@ -2,9 +2,10 @@ import requests
 from flask import Flask, jsonify, request
 
 from monitor.pelando.core.monitor_pelando import ControllerMonitorPelando
+from monitor.pichau.core.monitor_pichau import ControllerMonitorPichau
 from src.controller.base_main import BaseMain
 from src.controller.controller_scraps import ControllerScraps
-from src.server.modules.commands import *
+from src.server.modules.commands_controller import *
 from src.server.modules.ngrok import run_ngrok, get_ngrok_url
 
 
@@ -48,9 +49,17 @@ class TelegramBot(BaseMain):
 
             # Handle different commands based on message text
             if '/start' in message_text:
-                self.command_handler.handle_start(chat_id, self.pichau_monitor)
-            elif '/stop' in message_text:
+                self.command_handler.handle_start(chat_id)
+            elif '/stop_pichau' in message_text:
+                self.command_handler.handle_stop_pichau(chat_id, self.pichau_monitor)
+            elif '/monitorar_pichau' in message_text:
+                self.command_handler.handle_start_pichau(chat_id, self.pichau_monitor)
+            elif '/parar_monitoramento_pichau' in message_text:
                 self.command_handler.handle_stop(chat_id, self.pichau_monitor)
+            elif '/monitorar_pelando' in message_text:
+                self.command_handler.handle_start_pelando(chat_id, self.pichau_monitor)
+            elif '/parar_monitoramento_pelando' in message_text:
+                self.command_handler.handle_stop_pelando(chat_id, self.pichau_monitor)
             elif '/help' in message_text:
                 self.command_handler.handle_help(chat_id)
             elif '/list_desejos' in message_text:

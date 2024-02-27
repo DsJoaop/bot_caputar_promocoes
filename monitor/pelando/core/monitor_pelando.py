@@ -1,3 +1,4 @@
+import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
 
 from monitor.pelando.core.analyze_pelando import AnalyzePelando
@@ -31,7 +32,8 @@ class ControllerMonitorPelando(BaseMain):
 
     def iniciar_monitoramento(self):
         if not self.running:
-            self.dividir_categorias()
+            process = multiprocessing.Process(target=self.dividir_categorias)
+            process.start()
 
     def parar_monitoramento(self):
         self.running = False
