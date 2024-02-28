@@ -8,25 +8,28 @@ from unshortenit import UnshortenIt
 
 from monitor.pichau.buy.buy_pichau import PichauAutomator
 
+
+def _setup_driver():
+    options = Options()
+    options.headless = True
+    return Edge(options=options)
+
+
+def _extract_message_info(message):
+    author = message.find_element(By.CSS_SELECTOR, "#author-name").text
+    text = message.find_element(By.CSS_SELECTOR, "#message").text
+    return author, text
+
+
 class YouTubeLiveChatScraper:
     def __init__(self, url):
         self.url = url
-        self.driver = self._setup_driver()
+        self.driver = _setup_driver()
         self.all_messages = []
         self.last_message_id = ""
         self.last_link_processed = ""
         self.pichau_automator = PichauAutomator()
         self.unshortener = UnshortenIt()
-
-    def _setup_driver(self):
-        options = Options()
-        options.headless = True
-        return Edge(options=options)
-
-    def _extract_message_info(self, message):
-        author = message.find_element(By.CSS_SELECTOR, "#author-name").text
-        text = message.find_element(By.CSS_SELECTOR, "#message").text
-        return author, text
 
     def _is_link(self, keyword, text):
         words = text.split()
@@ -51,7 +54,7 @@ class YouTubeLiveChatScraper:
                 new_message_id = new_message.get_attribute("id")
 
                 if new_message_id != self.last_message_id:
-                    author, text = self._extract_message_info(new_message)
+                    author, text = _extract_message_info(new_message)
                     message = f"[{author}]: {text}"
 
                     is_link, link = self._is_link(keyword, text)
@@ -67,6 +70,7 @@ class YouTubeLiveChatScraper:
 
         except KeyboardInterrupt:
             self.driver.quit()
+
 
 if __name__ == "__main__":
     youtube_url = "https://www.youtube.com/live_chat?v=f8TeYl2faqA"

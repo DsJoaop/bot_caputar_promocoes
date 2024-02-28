@@ -1,8 +1,5 @@
 import requests
 from flask import Flask, jsonify, request
-
-from monitor.pelando.core.monitor_pelando import ControllerMonitorPelando
-from monitor.pichau.core.monitor_pichau import ControllerMonitorPichau
 from src.controller.base_main import BaseMain
 from src.controller.controller_scraps import ControllerScraps
 from src.server.modules.commands_controller import *
@@ -18,8 +15,6 @@ class TelegramBot(BaseMain):
         self.ngrok_url = None
         self.controller_links = ControllerScraps()
         self.command_handler = CommandHandler(self.user_states, self.get_notify())
-        self.pichau_monitor = ControllerMonitorPichau()
-        self.pelando_monitor = ControllerMonitorPelando()
         self.app = Flask(__name__)
 
     def notify_user(self, message):
@@ -47,41 +42,15 @@ class TelegramBot(BaseMain):
             if chat_id not in self.user_states:
                 self.user_states[chat_id] = {}
 
-            # Handle different commands based on message text
             if '/start' in message_text:
                 self.command_handler.handle_start(chat_id)
-            elif '/stop_pichau' in message_text:
-                self.command_handler.handle_stop_pichau(chat_id, self.pichau_monitor)
-            elif '/monitorar_pichau' in message_text:
-                self.command_handler.handle_start_pichau(chat_id, self.pichau_monitor)
-            elif '/parar_monitoramento_pichau' in message_text:
-                self.command_handler.handle_stop(chat_id, self.pichau_monitor)
-            elif '/monitorar_pelando' in message_text:
-                self.command_handler.handle_start_pelando(chat_id, self.pichau_monitor)
-            elif '/parar_monitoramento_pelando' in message_text:
-                self.command_handler.handle_stop_pelando(chat_id, self.pichau_monitor)
-            elif '/help' in message_text:
-                self.command_handler.handle_help(chat_id)
-            elif '/list_desejos' in message_text:
-                self.command_handler.handle_list_desejos(chat_id)
-            elif '/add_desejos' in message_text:
-                self.command_handler.handle_add_list_desejos(chat_id)
             else:
-                self.command_handler.command_process(self.user_states, chat_id, self.get_notify())
+                self.command_handler.handle_bot(chat_id)
 
         elif data and 'callback_query' in data and 'data' in data['callback_query']:
-            # Process callback queries
+            chat_id = data['callback_query']['message']['chat']['id']
             resposta = data['callback_query']['data']
-            entities = data['callback_query']['message']['entities']
-
-            link = None
-            if len(entities) > 3 and entities[1]['type'] == 'text_link':
-                link = entities[1]['url']
-            if link is not None and resposta == "sim":
-                mensagem = self.get_buy_pichau().run_automation_pix(link)
-                self.notify_user(mensagem)
-            else:
-                self.notify_user("Ok, compra não autorizada.")
+            self.command_handler.command_process(self.user_states, chat_id, resposta)
 
         return jsonify({'success': True})
 
