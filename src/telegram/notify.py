@@ -20,7 +20,14 @@ class Notificacao:
 
         self._chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
-
+    def handle_button_click(self, message_id):
+        url = f"https://api.telegram.org/bot{self._bot_token}/deleteMessage"
+        params = {
+            'chat_id': self._chat_id,
+            'message_id': message_id
+        }
+        response = requests.post(url, params=params)
+        return response.json()
 
     def enviar_mensagem(self, mensagem, reply_markup=None):
         dados = {

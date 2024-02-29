@@ -50,7 +50,8 @@ class TelegramBot(BaseMain):
         elif data and 'callback_query' in data and 'data' in data['callback_query']:
             chat_id = data['callback_query']['message']['chat']['id']
             resposta = data['callback_query']['data']
-            self.command_handler.command_process(self.user_states, chat_id, resposta)
+            message_id = data['callback_query']['message']['message_id']
+            self.command_handler.command_process(self.user_states, chat_id, resposta,message_id)
 
         return jsonify({'success': True})
 

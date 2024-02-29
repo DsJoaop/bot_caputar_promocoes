@@ -12,10 +12,8 @@ def handle_start_pichau():
     )
     reply_markup = {
         'inline_keyboard': [
-            [{'text': 'Iniciar Monitoramento', 'callback_data': '/start_monitoramento'},
-             {'text': 'Parar Monitoramento', 'callback_data': '/stop_monitoramento'}],
-            [{'text': 'Ajuda', 'callback_data': '/help_pichau'}, {'text': '/pichau', 'callback_data': '/pichau'}],
-            [{'text': '/pelando', 'callback_data': '/pelando'}]
+            [{'text': 'Iniciar', 'callback_data': '/start_monitoramento'},
+             {'text': 'Parar', 'callback_data': '/stop_monitoramento'}]
         ]
     }
     return menu_message, reply_markup
