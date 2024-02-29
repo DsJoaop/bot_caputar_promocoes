@@ -5,7 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from unshortenit import UnshortenIt
-
 from monitor.pichau.buy.buy_pichau import PichauAutomator
 
 
@@ -22,8 +21,7 @@ def _extract_message_info(message):
 
 
 class YouTubeLiveChatScraper:
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
         self.driver = _setup_driver()
         self.all_messages = []
         self.last_message_id = ""
@@ -40,9 +38,9 @@ class YouTubeLiveChatScraper:
                     return True, expanded_url
         return False, None
 
-    def scrape_live_chat(self, keyword):
+    def scrape_live_chat(self,keyword, url):
         try:
-            self.driver.get(self.url)
+            self.driver.get(url)
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "yt-live-chat-text-message-renderer"))
             )
@@ -75,5 +73,5 @@ class YouTubeLiveChatScraper:
 if __name__ == "__main__":
     youtube_url = "https://www.youtube.com/live_chat?v=f8TeYl2faqA"
     link_url = "https"
-    scraper = YouTubeLiveChatScraper(youtube_url)
-    scraper.scrape_live_chat(link_url)
+    scraper = YouTubeLiveChatScraper()
+    scraper.scrape_live_chat('https', youtube_url)

@@ -4,7 +4,7 @@ import logging
 
 from src.model.oferta import Oferta
 from src.controller.controller_scraps import ControllerScraps
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier
 
 
 class AnalyzePelando:
@@ -12,7 +12,7 @@ class AnalyzePelando:
         self.controlador_link = controlador_link
         self.categoria = categoria
         self.url = url
-        self.notificador: Notificacao = notificador
+        self.notificador: Notifier = notificador
         self.produto = None
 
     def _scraping_inicial(self):

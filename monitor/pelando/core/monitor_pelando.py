@@ -3,14 +3,14 @@ from concurrent.futures import ProcessPoolExecutor
 
 from monitor.pelando.core.analyze_pelando import AnalyzePelando
 from src.controller.base_main import BaseMain
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier
 
 
 class ControllerMonitorPelando(BaseMain):
     def __init__(self):
         super().__init__()
         if self._config:
-            self.notificador = Notificacao()
+            self.notificador = Notifier()
             self.desconto_minimo = 0
             self.lista_desejo = []
             self.running = False

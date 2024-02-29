@@ -3,7 +3,7 @@ import webbrowser
 import pyperclip
 
 from monitor.pichau.buy.iteration_image import BuyPichauImage
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier
 
 
 def open_link(link):
@@ -15,7 +15,7 @@ def open_link(link):
 class PichauAutomator:
     def __init__(self):
         self.buy_interaction = BuyPichauImage()
-        self.notifier = Notificacao()
+        self.notifier = Notifier()
 
     def execute_buy_automation(self, link, img_paths, max_attempts=3):
         open_link(link)

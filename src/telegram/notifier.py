@@ -11,7 +11,7 @@ from src.model.oferta import Oferta
 logger = logging.getLogger(__name__)
 
 
-class Notificacao:
+class Notifier:
     def __init__(self):
 
         load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
@@ -20,7 +20,7 @@ class Notificacao:
 
         self._chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
-    def handle_button_click(self, message_id):
+    def delete_mensage(self, message_id):
         url = f"https://api.telegram.org/bot{self._bot_token}/deleteMessage"
         params = {
             'chat_id': self._chat_id,
@@ -61,7 +61,8 @@ class Notificacao:
 
         reply_markup = {
             'inline_keyboard': [
-                [{'text': 'Sim', 'callback_data': 'sim'}, {'text': 'Não', 'callback_data': 'nao'}]
+                [{'text': 'Sim', 'callback_data': '/pichau_autorizar_compra'},
+                 {'text': 'Não', 'callback_data': '/pichau_negar_compra'}]
             ]
         }
         self.enviar_mensagem(mensagem, reply_markup)
@@ -88,5 +89,5 @@ class Notificacao:
 
 
 if __name__ == '__main__':
-    noty = Notificacao()
+    noty = Notifier()
     noty.enviar_mensagem('Em manutenção')

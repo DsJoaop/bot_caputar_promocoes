@@ -43,6 +43,7 @@ class TelegramBot(BaseMain):
                 self.user_states[chat_id] = {}
 
             if '/start' in message_text:
+                self.command_handler.handle_stop_all()
                 self.command_handler.handle_start(chat_id)
             else:
                 self.command_handler.handle_bot(chat_id)
@@ -51,8 +52,14 @@ class TelegramBot(BaseMain):
             chat_id = data['callback_query']['message']['chat']['id']
             resposta = data['callback_query']['data']
             message_id = data['callback_query']['message']['message_id']
-            self.command_handler.command_process(self.user_states, chat_id, resposta,message_id)
 
+            user_state = self.user_states.get(chat_id, {}).get('state')
+            if not user_state:
+                self.command_handler.command_process(self.user_states, chat_id, resposta, message_id)
+            elif 'commands_pichau' in user_state:
+                self.command_handler.c_pichau.commando_process(self.user_states, chat_id, resposta, message_id)
+            else:
+                self.command_handler.c_pelando.commando_process(self.user_states, chat_id, resposta, message_id)
         return jsonify({'success': True})
 
     def run_server(self):

@@ -1,55 +1,64 @@
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
 from monitor.pichau.core.analyze_pichau import AnalyzePichau
+from monitor.pichau.live.youtube_live import YouTubeLiveChatScraper, scraper
 from src.controller.base_main import BaseMain
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier as TelegramNotifier
 
 
-class ControllerMonitorPichau(BaseMain):
+class PichauMonitorController(BaseMain):
     def __init__(self):
         super().__init__()
         if self._config:
-            self.notificador = Notificacao()
-            self.desconto_minimo = 0
-            self.lista_desejo = []
-            self.running = False
+            self.notifier = TelegramNotifier()
+            self.live_scraper = YouTubeLiveChatScraper()
+            self.minimum_discount = 0
+            self.wishlist = []
+            self.running_ecommerce = False
+            self.running_live = False
         else:
-            raise ValueError("Configurações do Telegram não encontradas no arquivo de configuração.")
+            raise ValueError("Telegram configurations not found in the configuration file.")
 
-    def dividir_categorias(self):
+    def split_categories(self):
         if self._config and 'categorias' in self._config:
-            self.running = True
-            self.lista_desejo = []
+            self.running_ecommerce = True
+            self.wishlist = []
 
             with ProcessPoolExecutor() as executor:
-                for categoria, url in self._config['categorias'].items():
-                    executor.submit(self.monitorar_categoria, categoria, url)
+                for category, url in self._config['categorias'].items():
+                    executor.submit(self.monitor_category, category, url)
         else:
-            print(
-                "Configurações não carregadas ou categorias não encontradas."
-                " Não foi possível iniciar o monitoramento de preço.")
+            print("Settings not loaded or categories not found. Unable to start price monitoring.")
 
-    def iniciar_monitoramento(self):
-        if not self.running:
-            process = multiprocessing.Process(target=self.dividir_categorias)
+    def live_crawler(self):
+        scraper.scrape_live_chat('https')
+
+    def start_live_monitoring(self):
+        if not self.running_live:
+            process = multiprocessing.Process(target=self.live_crawler)
             process.start()
 
-    def parar_monitoramento(self):
-        self.running = False
+    def start_monitoring(self):
+        if not self.running_ecommerce:
+            process = multiprocessing.Process(target=self.split_categories)
+            process.start()
 
-    def reiniciar_monitoramento(self):
-        self.parar_monitoramento()
-        self.iniciar_monitoramento()
+    def stop_monitoring(self):
+        self.running_ecommerce = False
 
-    def monitorar_categoria(self, categoria, url):
-        while self.running:
-            category_monitor = AnalyzePichau(categoria, url, self.get_controller_links(), [], self.get_notify())
+    def restart_monitoring(self):
+        self.stop_monitoring()
+        self.start_monitoring()
+
+    def monitor_category(self, category, url):
+        while self.running_ecommerce:
+            category_monitor = AnalyzePichau(category, url, self.get_controller_links(), [], self.get_notify())
             category_monitor.run()
 
 
 def main():
-    monitoramento = ControllerMonitorPichau()
-    monitoramento.iniciar_monitoramento()
+    monitor = PichauMonitorController()
+    monitor.start_monitoring()
 
 
 if __name__ == "__main__":

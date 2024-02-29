@@ -7,7 +7,7 @@ from typing import List
 from src.controller.controller_scraps import ControllerScraps
 from monitor.pichau.buy.buy_pichau import PichauAutomator
 from src.model.pichau import ProdutoPichau
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier
 
 
 class AnalyzePichau:
@@ -16,7 +16,7 @@ class AnalyzePichau:
         self.controlador_link = controlador_link
         self.categoria = categoria
         self.url = url
-        self.notificador: Notificacao = notificador
+        self.notificador: Notifier = notificador
         self.produtos_desejados = produtos_desejados
         self.automator = PichauAutomator()
         self.produtos: List[ProdutoPichau] = self._scraping_inicial()

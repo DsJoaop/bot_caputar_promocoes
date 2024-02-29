@@ -7,7 +7,7 @@ from config.setting_load import load_config
 from src.controller.controller_scraps import ControllerScraps
 from src.model.desconto import Desconto
 from monitor.pichau.buy.buy_pichau import PichauAutomator
-from src.telegram.notify import Notificacao
+from src.telegram.notifier import Notifier
 
 
 class BaseMain:
@@ -19,7 +19,7 @@ class BaseMain:
         self._config = load_config()
         self._buy_automation = PichauAutomator()
         self._product_link = ControllerScraps()
-        self._notificador = Notificacao()
+        self._notificador = Notifier()
         self._config_desejos = self._config['desejos']
 
     def get_config(self) -> dict:
@@ -37,7 +37,7 @@ class BaseMain:
     def get_products(self) -> List[Desconto]:
         return self._product_link.get_list_desejos()
 
-    def get_notify(self) -> Notificacao:
+    def get_notify(self) -> Notifier:
         return self._notificador
 
     def get_controller_links(self) -> ControllerScraps:
