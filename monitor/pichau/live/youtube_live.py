@@ -69,9 +69,3 @@ class YouTubeLiveChatScraper:
         except KeyboardInterrupt:
             self.driver.quit()
 
-
-if __name__ == "__main__":
-    youtube_url = "https://www.youtube.com/live_chat?v=f8TeYl2faqA"
-    link_url = "https"
-    scraper = YouTubeLiveChatScraper()
-    scraper.scrape_live_chat('https', youtube_url)

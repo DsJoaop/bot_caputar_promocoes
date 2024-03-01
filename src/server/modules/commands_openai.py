@@ -1,18 +1,39 @@
 import os
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
+
 
 class CommandOpenai:
     def __init__(self):
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
         self.client = OpenAI(api_key=api_key)
-        self.limits = {
-            'rpm': {'limit': 3, 'count': 0, 'last_reset': datetime.now()},
-            'rpd': {'limit': 200, 'count': 0, 'last_reset': datetime.now()},
-            'tpm': {'limit': 40000, 'count': 0, 'last_reset': datetime.now()}
-        }
+        self.config_file = None
+        self.limits = self.load_limits()
+
+    def load_limits(self):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        parent_directory = os.path.dirname(current_directory)
+        assets_directory = os.path.abspath(os.path.join(parent_directory, '..', '..', 'config'))
+        file_path = os.path.join(assets_directory, 'limits_config.json')
+        self.config_file = file_path
+
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as config_file:
+                return json.load(config_file)
+        else:
+            print("Limites não carregados")
+            return {
+                'rpm': {'limit': 3, 'count': 0, 'last_reset': str(datetime.now())},
+                'rpd': {'limit': 200, 'count': 0, 'last_reset': str(datetime.now())},
+                'tpm': {'limit': 40000, 'count': 0, 'last_reset': str(datetime.now())}
+            }
+
+    def save_limits(self):
+        with open(self.config_file, 'w') as file:
+            json.dump(self.limits, file, indent=4)
 
     def check_limits(self):
         self.check_reset_time()
@@ -23,9 +44,10 @@ class CommandOpenai:
     def check_reset_time(self):
         current_time = datetime.now()
         for limit_type, limit_data in self.limits.items():
-            if current_time - limit_data['last_reset'] > self.get_reset_interval(limit_type):
+            last_reset_time = datetime.fromisoformat(limit_data['last_reset'])
+            if current_time - last_reset_time > self.get_reset_interval(limit_type):
                 limit_data['count'] = 0
-                limit_data['last_reset'] = current_time
+                limit_data['last_reset'] = str(current_time)
 
     def get_reset_interval(self, limit_type):
         if limit_type == 'rpm':
@@ -39,16 +61,17 @@ class CommandOpenai:
         self.check_limits()
         completion = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
+            max_tokens=256,
             messages=[
                 {"role": "system",
-                 "content": "Oh, que surpresa! Outro comando que não consegui encontrar."
-                            " Você deve ser tão inovador."},
+                 "content": "Deve responder com sarcasmo, ironia e de forma ríspida. Seja sucinto"},
                 {"role": "user", "content": message}
             ]
         )
         for limit_data in self.limits.values():
             limit_data['count'] += 1
-        return completion.choices[0].message
+        self.save_limits()
+        return completion.choices[0].message.content
 
 
 def main():
@@ -56,7 +79,6 @@ def main():
     user_input = input("Digite sua mensagem: ")
     response = openai_command.generate_response(user_input)
     print("Resposta do modelo:", response)
-
 
 
 if __name__ == "__main__":

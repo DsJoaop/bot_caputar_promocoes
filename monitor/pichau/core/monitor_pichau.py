@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor
 import multiprocessing
 from monitor.pichau.core.analyze_pichau import AnalyzePichau
-from monitor.pichau.live.youtube_live import YouTubeLiveChatScraper, scraper
+from monitor.pichau.live.youtube_live import YouTubeLiveChatScraper
 from src.controller.base_main import BaseMain
 from src.telegram.notifier import Notifier as TelegramNotifier
 
@@ -11,7 +11,6 @@ class PichauMonitorController(BaseMain):
         super().__init__()
         if self._config:
             self.notifier = TelegramNotifier()
-            self.live_scraper = YouTubeLiveChatScraper()
             self.minimum_discount = 0
             self.wishlist = []
             self.running_ecommerce = False
@@ -29,14 +28,6 @@ class PichauMonitorController(BaseMain):
                     executor.submit(self.monitor_category, category, url)
         else:
             print("Settings not loaded or categories not found. Unable to start price monitoring.")
-
-    def live_crawler(self):
-        scraper.scrape_live_chat('https')
-
-    def start_live_monitoring(self):
-        if not self.running_live:
-            process = multiprocessing.Process(target=self.live_crawler)
-            process.start()
 
     def start_monitoring(self):
         if not self.running_ecommerce:
@@ -59,6 +50,7 @@ class PichauMonitorController(BaseMain):
 def main():
     monitor = PichauMonitorController()
     monitor.start_monitoring()
+    print("Starting monitoring...")
 
 
 if __name__ == "__main__":

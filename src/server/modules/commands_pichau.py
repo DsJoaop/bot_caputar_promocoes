@@ -5,19 +5,19 @@ from monitor.pichau.core.monitor_pichau import PichauMonitorController
 
 def start_pichau_menu():
     menu_message = (
-        "Bem-vindo ao menu Pichau! Por favor, selecione uma das seguintes opções:\n\n"
-        "1. 🤖 Monitorar - Comece a monitorar um produto.\n"
-        "2. ❌ Stop - Pare o monitoramento de um produto.\n"
-        "3. 🔁 Resetar - Reinicie o monitoramento de um produto.\n"
-        "4. 🛒 Lista de Desejos - Veja sua lista de produtos monitorados.\n"
-        "5. 🧷 Adicionar à lista - Adicione um novo produto à sua lista de desejos."
+        "Bem-vindo ao menu Pichau! Por favor, selecione uma das seguintes opções:\n\n\n"
+        "1. 🤖 Monitorar - Comece a monitorar um produto.\n\n"
+        "2. ❌ Stop - Pare o monitoramento de um produto.\n\n"
+        "3. 🔁 Resetar - Reinicie o monitoramento de um produto.\n\n"
+        "4. 🛒 Lista de Desejos - Veja sua lista de produtos monitorados.\n\n"
+        "5. 🧷 Adicionar à lista - Adicione um novo produto à sua lista de desejos.\n"
     )
     reply_markup = {
         'inline_keyboard': [
-            [{'text': '🤖 Monitorar', 'callback_data': '/start_pichau'}, {'text': '❌ Stop', 'callback_data': '/stop_pichau'}],
-            [{'text': '🔁 Resetar', 'callback_data': '/reset_pichau'}, {'text': '🛒 Lista Desejos', 'callback_data': '/list_desejos_pichau'}],
-            [{'text': '🧷 Adicionar a lista', 'callback_data': '/start_monitoramento'}],
-            [{'text': '🎥 Monitorar Live', 'callback_data': '/start_live_pichau'}]
+            [{'text': '🤖 Monitorar', 'callback_data': '/pich_start'}, {'text': '❌ Stop', 'callback_data': '/pich_stop'}],
+            [{'text': '🔁 Resetar', 'callback_data': '/pich_reset'}, {'text': '🛒 Lista Desejos', 'callback_data': '/pich_list'}],
+            [{'text': '🧷 Adicionar a lista', 'callback_data': '/pich_add_list'}],
+            [{'text': '🎥 Monitorar Live', 'callback_data': '/pich_start_live'}]
         ]
     }
     return menu_message, reply_markup
@@ -111,26 +111,28 @@ class PichauCommandHandler:
     def start_live_monitor(self):
         self.monitor_controller.start_live_monitoring()
 
-    def process_command(self, update, context):
-        query = update.callback_query
-        data = query.data
+    def process_command(self, user_states, chat_id, resposta, message_id):
+        if resposta == '/pich_start':
+            self.start_monitor()
+        elif resposta == '/pich_stop':
+            self.stop_monitor()
+        elif resposta == '/pich_reset':
+            self.reset_monitor()
+        elif resposta == '/pich_list':
+            response = self.handle_wishlist(chat_id)
+            # Se a resposta não for None, é porque houve algum erro.
+            if response:
+                print(response)  # Você pode lidar com a mensagem de erro de alguma maneira
+        elif resposta == '/pich_add_list':
+            response = self.handle_add_wishlist(chat_id)
+            # Se a resposta não for None, é porque houve algum erro.
+            if response:
+                print(response)  # Você pode lidar com a mensagem de erro de alguma maneira
+        elif resposta == '/pich_start_live':
+            self.start_live_monitor()
+        else:
+            # Se o callback_data não corresponder a nenhum comando esperado
+            print("Comando não reconhecido.")
 
-        # Dictionary of callbacks and their respective functions
-        callbacks = {
-            '/start_pichau': self.start_monitor,
-            '/stop_pichau': self.stop_monitor,
-            '/reset_pichau': self.reset_monitor,
-            '/list_desejos_pichau': load_wishlist,
-            '/start_live_pichau': self.start_live_monitor
-        }
 
-        # Get the function associated with the callback and execute it
-        callback_function = callbacks.get(data)
-        if callback_function:
-            callback_function()
 
-        # Update the message to indicate that the command has been processed
-        query.edit_message_text(text="Comando processado com sucesso!")
-
-        # Optionally, you can return something after processing the command
-        return

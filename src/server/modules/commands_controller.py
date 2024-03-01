@@ -25,8 +25,8 @@ class CommandHandler:
             )
             reply_markup = {
                 'inline_keyboard': [
-                    [{'text': '❌ Stop', 'callback_data': '/stop'}, {'text': '😭 Help', 'callback_data': '/help'}],
-                    [{'text': '🤖 Pichau', 'callback_data': '/pichau'}, {'text': '🤖 Pelando', 'callback_data': '/pelando'}]
+                    [{'text': '❌ Stop', 'callback_data': '/main_stop'}, {'text': '😭 Help', 'callback_data': '/main_help'}],
+                    [{'text': '🤖 Pichau', 'callback_data': '/main_pichau'}, {'text': '🤖 Pelando', 'callback_data': '/main_pelando'}]
                 ]
             }
             self.notifier.enviar_mensagem(help_message, reply_markup=reply_markup)
@@ -36,22 +36,29 @@ class CommandHandler:
     def command_process(self, user_states, chat_id, message_text, mensage_id):
         user_state = self.user_states.get(chat_id, {}).get('state')
         if not user_state:
-            if message_text == '/stop':
+            if message_text == '/main_stop':
                 self.handle_stop_all()
                 self.notifier.delete_mensage(mensage_id)
                 self.notifier.enviar_mensagem("Todos os processos foram parados com sucesso!")
-            elif message_text == '/pichau':
+            elif message_text == '/main_pichau':
                 mensagem, markup = start_pichau_menu()
                 self.notifier.delete_mensage(mensage_id)
                 self.notifier.enviar_mensagem(mensagem, markup)
-            elif message_text == '/pelando':
+            elif message_text == '/main_stop':
+                mensagem = self.handle_stop_all()
+                self.notifier.delete_mensage(mensage_id)
+                self.notifier.enviar_mensagem(mensagem)
+            elif message_text == '/main_pelando':
                  print("pelando")
             else:
                 print("Comando não reconhecido")
 
-    def handle_bot(self, chat_id):
-        pass
+    def handle_bot(self, message_id, resposta):
+        mensagem = self.botIA.generate_response(resposta)
+        self.notifier.delete_mensage(message_id)
+        self.notifier.enviar_mensagem(mensagem)
 
     def handle_stop_all(self):
         self.c_pichau.stop_monitor()
         self.c_pelando.handle_stop_pelando()
+        return 'Todos os processos foram parados'

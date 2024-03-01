@@ -45,21 +45,21 @@ class TelegramBot(BaseMain):
             if '/start' in message_text:
                 self.command_handler.handle_stop_all()
                 self.command_handler.handle_start(chat_id)
-            else:
-                self.command_handler.handle_bot(chat_id)
 
         elif data and 'callback_query' in data and 'data' in data['callback_query']:
             chat_id = data['callback_query']['message']['chat']['id']
             resposta = data['callback_query']['data']
             message_id = data['callback_query']['message']['message_id']
+            id_response = resposta[:5]
 
-            user_state = self.user_states.get(chat_id, {}).get('state')
-            if not user_state:
+            if "/main" in id_response:
                 self.command_handler.command_process(self.user_states, chat_id, resposta, message_id)
-            elif 'commands_pichau' in user_state:
-                self.command_handler.c_pichau.commando_process(self.user_states, chat_id, resposta, message_id)
+            elif '/pich' in id_response:
+                self.command_handler.c_pichau.process_command(self.user_states, chat_id, resposta, message_id)
+            elif '/pela' in id_response:
+                self.command_handler.c_pelando.process_command(self.user_states, chat_id, resposta, message_id)
             else:
-                self.command_handler.c_pelando.commando_process(self.user_states, chat_id, resposta, message_id)
+                self.command_handler.handle_bot(message_id, resposta)
         return jsonify({'success': True})
 
     def run_server(self):
