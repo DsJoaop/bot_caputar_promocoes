@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import requests
 from bs4 import BeautifulSoup
@@ -61,7 +61,7 @@ class PichauScraping:
                 return None
 
             # Criar objeto Produto
-            product = ProdutoPichau(link, float(product_price))
+            product = ProdutoPichau(response.url, float(product_price))
             product.category = nome_tag.split()[0] + ' ' + nome_tag.split()[1] + ' ' + nome_tag.split()[2]
             product.link_img = self.extract_img(product)
             product.nome = nome_tag
@@ -83,6 +83,20 @@ class PichauScraping:
             if product_price_with_currency:
                 product_price = product_price_with_currency.replace('R$', '').replace(',', '').strip()
                 return float(product_price)
+        except (requests.RequestException, AttributeError) as e:
+            print("Falha ao obter a página ou encontrar elementos:", e)
+
+    def extract_price_url(self, link, max_price=None) -> tuple[float, str]:
+        try:
+            response = requests.get(link, headers=self.headers, timeout=20)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, 'html.parser')
+
+            product_price_with_currency = soup.find('meta', {'property': 'product:price:amount'}).get('content')
+
+            if product_price_with_currency:
+                product_price = product_price_with_currency.replace('R$', '').replace(',', '').strip()
+                return float(product_price), response.url
         except (requests.RequestException, AttributeError) as e:
             print("Falha ao obter a página ou encontrar elementos:", e)
 

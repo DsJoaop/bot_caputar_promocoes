@@ -90,4 +90,4 @@ class Notifier:
 
 if __name__ == '__main__':
     noty = Notifier()
-    noty.enviar_mensagem('Em manutenção')
+    noty.enviar_mensagem('/vai você')

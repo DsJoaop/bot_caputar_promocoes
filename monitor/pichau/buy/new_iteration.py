@@ -19,7 +19,6 @@ class BuyPichauImage:
         self.img_paths = [
             '1_comprar.png',
             '2_finalizar_pedido.png',
-
             '3_metodo_envio.png',
             '4_continuar_pagamento.png',
             '5_pix.png',
@@ -28,7 +27,7 @@ class BuyPichauImage:
             '8_finalizar_agora.png',
         ]
         self.assets_directory = assets_directory
-        self.timeout_seconds = 2
+        self.timeout_seconds = 10
 
     def get_image_paths(self, image_names):
         return [os.path.join(self.assets_directory, image_name) for image_name in image_names]
@@ -66,8 +65,8 @@ class BuyPichauImage:
             return y
 
     def wait(self, image_path):
-        if os.path.basename(image_path) in [self.img_paths[3], self.img_paths[4]]:
-            time.sleep(1.4)
+        if os.path.basename(image_path) in [self.img_paths[2], self.img_paths[4], self.img_paths[5]]:
+            time.sleep(0.9)
 
     def search_on_screen(self, image_path, index):
         if not path_exists(image_path):

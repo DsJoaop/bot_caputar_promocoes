@@ -1,5 +1,5 @@
 from config.setting_load import get_lista_desejos as load_wishlist
-from monitor.pichau.buy.buy_pichau import PichauAutomator as PichauBuyAutomator
+from monitor.pichau.buy.buy_pichau import PichauAutomatorOld as PichauBuyAutomator
 from monitor.pichau.core.monitor_pichau import PichauMonitorController
 
 

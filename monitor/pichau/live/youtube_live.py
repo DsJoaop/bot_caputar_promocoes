@@ -4,8 +4,7 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from unshortenit import UnshortenIt
-from monitor.pichau.buy.buy_pichau import PichauAutomator
+from monitor.pichau.buy.old_buy import PichauAutomator
 
 
 def _setup_driver():
@@ -27,18 +26,15 @@ class YouTubeLiveChatScraper:
         self.last_message_id = ""
         self.last_link_processed = ""
         self.pichau_automator = PichauAutomator()
-        self.unshortener = UnshortenIt()
 
     def _is_link(self, keyword, text):
         words = text.split()
         for word in words:
             if keyword in word:
-                expanded_url = self.unshortener.unshorten(word)
-                if expanded_url and ("placa-de-video" in expanded_url or "processador" in expanded_url):
-                    return True, expanded_url
+                return True, word
         return False, None
 
-    def scrape_live_chat(self,keyword, url):
+    def scrape_live_chat(self, keyword, url):
         try:
             self.driver.get(url)
             WebDriverWait(self.driver, 10).until(
@@ -69,3 +65,8 @@ class YouTubeLiveChatScraper:
         except KeyboardInterrupt:
             self.driver.quit()
 
+
+if __name__ == '__main__':
+    live = YouTubeLiveChatScraper()
+    youtube_url = "https://www.youtube.com/live_chat?v=rLQ1oJGEMJQ"
+    live.scrape_live_chat('https', youtube_url)

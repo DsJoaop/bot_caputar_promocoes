@@ -74,3 +74,11 @@ class ProdutoPichau:
             f"🛒 <b>Deseja comprar?!</b>\n"
         )
         return mensagem
+
+    def compra_confirmada(self):
+        mensagem = (
+            f'<a href="{self._link_img}">&#8205;</a>\n\n'
+            f"<a href=\"{self._link}\">🔗 {self._nome}</a>\n\n"
+            f"💰 <b>Valor:</b> R${self._price:.2f}\n\n"
+        )
+        return mensagem
