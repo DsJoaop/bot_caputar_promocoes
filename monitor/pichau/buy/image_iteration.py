@@ -1,11 +1,12 @@
 import pyautogui
 import os
 import time
+import concurrent.futures
 
 
 def path_exists(image_path):
     if not os.path.exists(image_path):
-        print(f"File '{image_path}' not found.\n")
+        print(f"Arquivo '{image_path}' não encontrado.\n")
         return False
     return True
 
@@ -27,7 +28,8 @@ class BuyPichauImage:
             '8_finalizar_agora.png',
         ]
         self.assets_directory = assets_directory
-        self.timeout_seconds = 10
+        self.timeout_seconds = 0.1
+        self.last_image_path = None
 
     def get_image_paths(self, image_names):
         return [os.path.join(self.assets_directory, image_name) for image_name in image_names]
@@ -64,29 +66,56 @@ class BuyPichauImage:
         else:
             return y
 
-    def wait(self, image_path):
-        if os.path.basename(image_path) in [self.img_paths[2], self.img_paths[4], self.img_paths[5]]:
-            time.sleep(0.9)
+    def search_on_screen(self, image_paths, comprar):
+        all_results = []
 
-    def search_on_screen(self, image_path, index):
-        if not path_exists(image_path):
-            return False, index
+        for _ in range(30):
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = []
+                for image_path in image_paths:
+                    future = executor.submit(self.search_image, image_path, comprar)
+                    futures.append(future)
 
+                for future in concurrent.futures.as_completed(futures):
+                    try:
+                        result = future.result()
+                        all_results.append(result)
+                    except Exception as exc:
+                        print(f'Erro ao buscar imagem: {exc}')
+
+        # Verifica se todos os resultados são True
+        if all(all_results):
+            print(f'Retornando verdadeiro')
+            return True
+
+        # Verifica se a última imagem é uma das três últimas
+        if self.last_image_path in image_paths[7:10]:
+            return True
+
+        return False
+
+    def search_image(self, image_path, comprar):
         start_time = time.time()
-        self.wait(image_path)
-
         while time.time() - start_time < self.timeout_seconds:
             try:
                 x, y = pyautogui.locateCenterOnScreen(image_path, confidence=0.82)
                 y = self.verify_image(image_path, y)
+
+                if os.path.basename(image_path) == self.img_paths[6] and not comprar[0]:
+                    print("Não clicando na imagem de finalizar pagamento porque 'comprar' é False.")
+                    return False
+                elif os.path.basename(image_path) == self.img_paths[6] or os.path.basename(image_path) == \
+                        self.img_paths[4]:
+                    pyautogui.click(x, y)
+                    time.sleep(0.9)
+                    print(f"Encontrado {image_path}...")
+                    self.last_image_path = image_path
+                    return True
+
                 pyautogui.click(x, y)
-                print("\n-----------------------------------------------------")
-                print(f"{image_path} found.")
-                print("-----------------------------------------------------\n")
-
-                return True, index + 1
+                print(f"Encontrado {image_path}...")
+                self.last_image_path = image_path
+                return True
             except pyautogui.ImageNotFoundException:
-                print(f"Searching for {image_path}...")
-
-        print(f"Image path '{image_path}' not found on your screen after {self.timeout_seconds} seconds.\n")
-        return False, index
+                pass
+        return False

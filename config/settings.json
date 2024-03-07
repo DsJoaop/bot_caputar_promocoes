@@ -5,8 +5,7 @@
         "4070": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?sort=price-asc&rgpu=7369,7510",
         "3060": "https://www.pichau.com.br/hardware/placa-de-video/nvidia?sort=price-asc&rgpu=6343,6359,7192",
         "RX 7600": "https://www.pichau.com.br/hardware/placa-de-video/amd?rgpu=7400",
-        "RX 6650 xt":"https://www.pichau.com.br/hardware/placa-de-video/amd?rgpu=6631",
-        "AM4": "https://www.pichau.com.br/hardware/processadores/amd?socket=539&nucleo=135,154,710,729"
+        "RX 6650 xt":"https://www.pichau.com.br/hardware/placa-de-video/amd?rgpu=6631"
     },
     "promocoes": {
         "eletronicos": "https://www.pelando.com.br/eletronicos",

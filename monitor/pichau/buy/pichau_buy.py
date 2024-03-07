@@ -3,9 +3,7 @@ import time
 import webbrowser
 import pyperclip
 from unshortenit import UnshortenIt
-
-from monitor.pichau.buy.buy_pichau import PichauAutomatorOld
-from monitor.pichau.buy.old_iteration import BuyPichauImage
+from monitor.pichau.buy.image_iteration import BuyPichauImage
 from monitor.pichau.data.data_pichau import PichauScraping
 from src.telegram.notifier import Notifier
 
@@ -24,7 +22,6 @@ class PichauAutomator:
         self.scraper = PichauScraping()
         self._comprar = [False]
         self.unshortener = UnshortenIt()
-        self.auto = PichauAutomatorOld()
 
     def check_and_set_buy_flag(self, link):
         price, expanded_url = self.scraper.extract_price_url(link)

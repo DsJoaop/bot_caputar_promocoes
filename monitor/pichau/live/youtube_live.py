@@ -4,7 +4,7 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from monitor.pichau.buy.old_buy import PichauAutomator
+from monitor.pichau.buy.pichau_buy import PichauAutomator
 
 
 def _setup_driver():
