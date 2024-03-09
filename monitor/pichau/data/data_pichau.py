@@ -36,7 +36,7 @@ class PichauScraping:
         except (requests.RequestException, AttributeError) as e:
             print("Falha ao obter a página ou encontrar elementos:", e)
 
-    def _create_product(self, link, max_price=None) -> Optional[ProdutoPichau]:
+    def create_product(self, link, max_price=None) -> Optional[ProdutoPichau]:
         try:
             soup = self._get_soup(link)
             nome_tag = soup.find('meta', {'property': 'og:title'}).get('content')
@@ -61,7 +61,7 @@ class PichauScraping:
             produtos = []
             for card in cards:
                 link_produto = f"https://www.pichau.com.br{card.get('href').replace("'", '')}"
-                produto = self._create_product(link_produto, max_price)
+                produto = self.create_product(link_produto, max_price)
                 if produto is None:
                     break
                 print(f"{produto.nome} adicionado")

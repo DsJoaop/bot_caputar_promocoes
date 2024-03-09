@@ -5,7 +5,6 @@ import threading
 from typing import List
 
 from src.controller.controller_scraps import ControllerScraps
-from monitor.pichau.buy.buy_pichau import PichauAutomatorOld
 from src.model.pichau import ProdutoPichau
 from src.telegram.notifier import Notifier
 
@@ -18,7 +17,6 @@ class AnalyzePichau:
         self.url = url
         self.notificador: Notifier = notificador
         self.produtos_desejados = produtos_desejados
-        self.automator = PichauAutomatorOld()
         self.produtos: List[ProdutoPichau] = self._scraping_inicial()
 
     def _scraping_inicial(self):

@@ -28,18 +28,19 @@ class PichauAutomator:
         if expanded_url and ("placa-de-video" in expanded_url):
             self._comprar[0] = True
             self._price = price
-            print("A váriavel de comrpa está ativada")
+            print("A váriavel de compra está ativada")
+        return
 
-    def execute_buy_automation(self, link, img_paths):
+    def execute_buy_automation(self, link):
         start_time = time.time()
         open_link(link)
-        success = self.buy_interaction.search_on_screen(img_paths, self._comprar)
+        success = self.buy_interaction.search_on_screen(self._comprar)
         end_time = time.time()
         execution_time = end_time - start_time
         return success, execution_time
 
-    def run_automation(self, link, img_paths):
-        success_buy, execution_time = self.execute_buy_automation(link, img_paths)
+    def run_automation(self, link):
+        success_buy, execution_time = self.execute_buy_automation(link)
         mensagem = ""
         if success_buy:
             try:
@@ -59,7 +60,7 @@ class PichauAutomator:
                 "Não foi possível gerar o código devido a uma falha na "
                 "automatização de compra. Por favor, tente novamente."
             )
-            success_remove = self.auto.execute_remove_automation()
+            success_remove = True
 
             if success_remove:
                 mensagem += "\n\n✅ O carrinho foi limpo com sucesso ✅\n\n"
@@ -69,23 +70,18 @@ class PichauAutomator:
             print(mensagem)
         print(f"Tempo de execução: {execution_time} segundos.")
         print(mensagem)
-        self._comprar = False
+        self._comprar[0] = False
         return mensagem
 
     def run_automation_pix(self, link):
-        img_paths_pix = self.buy_interaction.get_pix_image_paths()
         thread = threading.Thread(target=self.check_and_set_buy_flag, args=(link,))
         thread.start()
-        return self.run_automation(link, img_paths_pix)
-
-    def run_automation_boleto(self, link):
-        img_paths_boleto = self.buy_interaction.get_boleto_image_paths()
-        return self.run_automation(link, img_paths_boleto)
+        return self.run_automation(link)
 
 
 if __name__ == "__main__":
     automator = PichauAutomator()
-    url = "https://www.pichau.com.br/adaptador-de-tomada-md9-2p-t-branco-nbr14136-branco"
+    url = "https://www.pichau.com.br/processador-amd-ryzen-5-4600g-6-core-12-threads-3-7ghz-4-2ghz-turbo-cache-11mb-am4-100-100000147box"
 
     # Run automation
     message = automator.run_automation_pix(url)
