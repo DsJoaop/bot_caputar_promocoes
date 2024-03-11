@@ -44,7 +44,7 @@ class ControllerMonitorPelando(BaseMain):
 
     def monitorar_categoria(self, categoria, url):
         while self.running:
-            category_monitor = AnalyzePelando(categoria, url, self.get_controller_links(), self.get_notify())
+            category_monitor = AnalyzePelando(categoria, url, self.get_scraper_pelando(), self.get_notify())
             category_monitor.run()
 
 

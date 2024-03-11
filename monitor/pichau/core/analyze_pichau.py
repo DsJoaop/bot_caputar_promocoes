@@ -4,14 +4,14 @@ import logging
 import threading
 from typing import List
 
-from src.controller.controller_scraps import ControllerScraps
+from monitor.pichau.data.data_pichau import PichauScraping
 from src.model.pichau import ProdutoPichau
 from src.telegram.notifier import Notifier
 
 
 class AnalyzePichau:
-    def __init__(self, categoria: str, url: str, controlador_link: ControllerScraps, produtos_desejados: List[ProdutoPichau],
-                 notificador):
+    def __init__(self, categoria: str, url: str, controlador_link: PichauScraping,
+                 produtos_desejados: List[ProdutoPichau], notificador: Notifier):
         self.controlador_link = controlador_link
         self.categoria = categoria
         self.url = url
@@ -21,7 +21,7 @@ class AnalyzePichau:
 
     def _scraping_inicial(self):
         try:
-            novos_produtos = self.controlador_link.get_category(self.url)
+            novos_produtos = self.controlador_link.scraping_category(self.url)
             return novos_produtos
         except Exception as e:
             logging.error(f"Erro ao fazer scraping inicial: {str(e)}")
@@ -44,7 +44,7 @@ class AnalyzePichau:
     def _check_price(self, produto_atual, indice):
         time.sleep(random.uniform(1, 40))
         try:
-            novo_preco = self.controlador_link.get_price_pichau(produto_atual.link)
+            novo_preco = self.controlador_link.extract_price(produto_atual.link)
             if produto_atual.price > novo_preco:
                 discount = ((novo_preco - produto_atual.price) / novo_preco) * 100
                 if abs(discount) >= 1:  # Considera mudanças de preço significativas

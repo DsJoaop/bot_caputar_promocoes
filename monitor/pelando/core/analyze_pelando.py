@@ -2,13 +2,13 @@ import random
 import time
 import logging
 
+from monitor.pelando.data.data_pelando import PelandoScraping
 from src.model.oferta import Oferta
-from src.controller.controller_scraps import ControllerScraps
 from src.telegram.notifier import Notifier
 
 
 class AnalyzePelando:
-    def __init__(self, categoria: str, url: str, controlador_link: ControllerScraps,notificador):
+    def __init__(self, categoria: str, url: str, controlador_link: PelandoScraping, notificador):
         self.controlador_link = controlador_link
         self.categoria = categoria
         self.url = url
@@ -17,7 +17,7 @@ class AnalyzePelando:
 
     def _scraping_inicial(self):
         try:
-            produto = self.controlador_link.get_last_product(self.url, self.categoria)
+            produto = self.controlador_link.scraping_last_item(self.url, self.categoria)
             return produto
         except Exception as e:
             logging.error(f"Erro ao fazer o primeiro scraping: {str(e)}")
@@ -30,7 +30,7 @@ class AnalyzePelando:
         while True:
             start_time = time.time()
             try:
-                novo_produto: Oferta = self.controlador_link.get_last_product(self.url, self.categoria)
+                novo_produto: Oferta = self.controlador_link.scraping_last_item(self.url, self.categoria)
 
                 if self.produto is None:
                     self.produto = novo_produto

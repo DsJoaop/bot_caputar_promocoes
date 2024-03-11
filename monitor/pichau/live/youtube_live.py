@@ -4,11 +4,16 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from monitor.pichau.buy.pichau_buy import PichauAutomator
+from monitor.pichau.buy.buy_iteration import PichauAutomator
 
 
 def _setup_driver():
     options = Options()
+    options.headless = True
+    options.add_argument('--remote-debugging-port=9222')
+    options.add_argument('--no-sandbox-')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--disable-gpu")
     options.headless = True
     return Edge(options=options)
 
@@ -68,5 +73,7 @@ class YouTubeLiveChatScraper:
 
 if __name__ == '__main__':
     live = YouTubeLiveChatScraper()
-    youtube_url = "https://www.youtube.com/live_chat?v=rLQ1oJGEMJQ"
+    url = "https://www.youtube.com/watch?v=POpQzj_9AV0"
+    video_id = url.split("v=")[1]
+    youtube_url = f"https://www.youtube.com/live_chat?v={video_id}"
     live.scrape_live_chat('https', youtube_url)

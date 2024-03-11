@@ -1,5 +1,5 @@
 from config.setting_load import get_lista_desejos as load_wishlist
-from monitor.pichau.buy.buy_pichau import PichauAutomatorOld as PichauBuyAutomator
+from monitor.pichau.buy.buy_iteration import PichauAutomator as PichauBuyAutomator
 from monitor.pichau.core.monitor_pichau import PichauMonitorController
 
 
@@ -109,7 +109,8 @@ class PichauCommandHandler:
         self.monitor_controller.restart_monitoring()
 
     def start_live_monitor(self):
-        self.monitor_controller.start_live_monitoring()
+        #self.monitor_controller.start_live_monitoring()
+        return
 
     def process_command(self, user_states, chat_id, resposta, message_id):
         if resposta == '/pich_start':

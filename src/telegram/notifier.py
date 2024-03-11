@@ -4,8 +4,6 @@ import requests
 import logging
 
 from dotenv import load_dotenv
-
-from config.setting_load import load_config
 from src.model.oferta import Oferta
 
 logger = logging.getLogger(__name__)
@@ -13,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 class Notifier:
     def __init__(self):
-
         load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
         self._bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self._base_url = f"https://api.telegram.org/bot{self._bot_token}/"
@@ -28,6 +25,25 @@ class Notifier:
         }
         response = requests.post(url, params=params)
         return response.json()
+
+    def enviar_imagem(self, mensagem, reply_markup=None):
+        dados = {
+            'chat_id': self._chat_id,
+            'text': mensagem,
+            'parse_mode': 'HTML'
+        }
+        if reply_markup:
+            dados['reply_markup'] = reply_markup
+
+        url = f"{self._base_url}sendMessage"
+        try:
+            response = requests.post(url, json=dados)
+            if response.status_code == 200:
+                logger.info("Mensagem enviada com sucesso!")
+            else:
+                logger.error("Falha ao enviar mensagem", response.status_code)
+        except requests.RequestException as e:
+            logger.exception(f"Erro ao enviar mensagem: {e}")
 
     def enviar_mensagem(self, mensagem, reply_markup=None):
         dados = {

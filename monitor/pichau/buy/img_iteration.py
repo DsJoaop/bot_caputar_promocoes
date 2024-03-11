@@ -1,5 +1,7 @@
 import os
 import concurrent.futures
+import time
+
 import pyautogui
 
 
@@ -40,9 +42,11 @@ class BuyPichauImage:
         return [os.path.join(self.assets_directory, image_name) for image_name in image_names]
 
     def verify_image(self, image_path, y):
-        if image_path == self.img_paths[2]:
+        if image_path in (self.img_paths[4], self.img_paths[7]):
+            time.sleep(0.8)
+            return y
+        elif image_path == self.img_paths[2]:
             return y + 55
-        return y
 
     def search_on_screen(self, comprar):
         all_results = []

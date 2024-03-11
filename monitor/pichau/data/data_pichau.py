@@ -98,7 +98,6 @@ class PichauScraping:
     def value_buy(self, link):
         try:
             self.driver.get(link)
-            # Espera pelo elemento estar visível
             element = self.wait.until(EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "td.MuiTableCell-root.MuiTableCell-body[MuiTableCell-alignRight][width='150']")))
 

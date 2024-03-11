@@ -3,7 +3,7 @@ import time
 import webbrowser
 import pyperclip
 from unshortenit import UnshortenIt
-from monitor.pichau.buy.image_iteration import BuyPichauImage
+from monitor.pichau.buy.img_iteration import BuyPichauImage
 from monitor.pichau.data.data_pichau import PichauScraping
 from src.telegram.notifier import Notifier
 
